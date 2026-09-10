@@ -126,7 +126,17 @@
     };
 
     function renderView(data, sourceLabel) {
-      document.getElementById('lastSync').innerText = `Data Source: ${sourceLabel} | Refreshed: ${new Date().toLocaleTimeString()}`;
+  const timestamp = data.updatedAt ? new Date(data.updatedAt) : new Date();
+  const formattedDate = timestamp.toLocaleString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  });
+  document.getElementById('lastSync').innerText = `Data Source: ${sourceLabel} | As of: ${formattedDate}`;
       buildTable('buyTable', data.buys, true);
       buildTable('sellTable', data.sells, false);
       buildMomTable('momUpTable', data.momUp, true);
