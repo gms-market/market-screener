@@ -277,7 +277,22 @@
 
     // 1. Render permanently on page load
     applyData(fallbackData, "Market Session");
+function updateClock() {
+      const now = new Date();
+      const currentFormatted = now.toLocaleString('en-IN', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+      });
+      document.getElementById('lastSync').innerText = `Market Session: Post-Close (08:30 PM Finalized) | Live View: ${currentFormatted}`;
+    }
 
+    updateClock();
+    setInterval(updateClock, 1000);
     // 2. Safe background fetch that NEVER touches the screen if there is any error
     setTimeout(async () => {
       try {
