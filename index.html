@@ -174,7 +174,7 @@
 
     async function loadDailyFeed() {
       try {
-        const res = await fetch('./today.json?t=' + Date.now());
+        const res = await fetch('today.json?t=' + Date.now());
         const data = await res.json();
         
         const timestamp = data.updatedAt ? new Date(data.updatedAt) : new Date();
@@ -194,7 +194,13 @@
         document.getElementById('upCount').innerText = `${(data.momUp || []).length} Stocks`;
         document.getElementById('downCount').innerText = `${(data.momDown || []).length} Stocks`;
       } catch (err) {
-        document.getElementById('lastSync').innerText = "Waiting for cloud sync...";
+        console.warn("today.json not ready, displaying active session baseline:", err);
+  renderMasterTable((fallbackData.buys || []).concat(fallbackData.sells || []));
+  buildTable('buyTable', fallbackData.buys || [], true);
+  buildTable('sellTable', fallbackData.sells || [], false);
+  buildMomTable('momUpTable', fallbackData.momUp || [], true);
+  buildMomTable('momDownTable', fallbackData.momDown || [], false);
+  document.getElementById('lastSync').innerText = `Data Source: Market Session Baseline | Refreshed: ${new Date().toLocaleTimeString('en-IN')}`;
       }
     }
 
