@@ -1,0 +1,32 @@
+name: Daily Institutional Data Sync
+
+on:
+  schedule:
+    # 1:00 PM UTC = 6:30 PM IST (Mon-Fri)
+    - cron: '0 13 * * 1-5'
+  workflow_dispatch: # Allows you to also trigger it manually anytime via a button
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run Data Collector
+        run: node fetch_deals.js
+
+      - name: Commit and Push Updated Data
+        run: |
+          git config --global user.name "GitHub Action Runner"
+          git config --global user.email "action@github.com"
+          git add today.json
+          git commit -m "Auto-update market data for $(date +'%Y-%m-%d')" || exit 0
+          git push
