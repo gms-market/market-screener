@@ -44,7 +44,7 @@
         <h2>NSE Institutional Market Screener (Full Session Scan)</h2>
         <div id="lastSync" class="status-badge">Loaded Market Session Data</div>
       </div>
-      <button onclick="loadDailyFeed()" style="background:var(--accent); color:#fff; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; font-weight:600;">↺ Refresh Feed</button>
+      <button onclick="window.location.reload()" style="background:var(--accent); color:#fff; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; font-weight:600;">↺ Reload Page</button>
     </header>
 
     <!-- Universe Filter & Search Bar -->
@@ -108,7 +108,7 @@
 
   <script>
     const fallbackData = {
-      updatedAt: new Date().toISOString(),
+      updatedAt: "2026-09-10T13:00:00.000Z",
       buys: [
         { sym: "HDFCBANK", price: 693.80, netFlow: 480.50, totalQty: 6925000, momScore: 9.4, signal: "STRONG BUY" },
         { sym: "ICICIBANK", price: 1228.10, netFlow: 390.20, totalQty: 3177000, momScore: 8.9, signal: "STRONG BUY" },
@@ -172,7 +172,7 @@
     let masterUniverse = [];
 
     function renderMasterTable(list) {
-      if (!Array.isArray(list) || list.length === 0) return;
+      if (!Array.isArray(list)) return;
       const tbody = document.getElementById('fullUniverseTable');
       tbody.innerHTML = '';
       document.getElementById('fullCount').innerText = `${list.length} Stocks Tracked`;
@@ -193,7 +193,7 @@
     }
 
     function buildTable(id, list, isBuy) {
-      if (!Array.isArray(list) || list.length === 0) return;
+      if (!Array.isArray(list)) return;
       const tbody = document.getElementById(id);
       tbody.innerHTML = `<tr><th>#</th><th>Stock</th><th>Inst. VWAP</th><th>Net Flow</th><th>Call</th></tr>`;
       list.slice(0, 20).forEach((s, idx) => {
@@ -209,7 +209,7 @@
     }
 
     function buildMomTable(id, list, isUp) {
-      if (!Array.isArray(list) || list.length === 0) return;
+      if (!Array.isArray(list)) return;
       const tbody = document.getElementById(id);
       tbody.innerHTML = `<tr><th>#</th><th>Stock</th><th>VWAP</th><th>Momentum Score</th><th>Action</th></tr>`;
       list.slice(0, 10).forEach((s, idx) => {
@@ -259,26 +259,24 @@
       document.getElementById('lastSync').innerText = `Data Source: ${label} | As of: ${new Date(data.updatedAt || Date.now()).toLocaleString('en-IN')}`;
     }
 
-    // Step 1: Render immediately
-    applyData(fallbackData, "Active Market Session");
+    // 1. Render permanently on page load
+    applyData(fallbackData, "Market Session");
 
-    // Step 2: In the background, load today.json safely
-    async function loadDailyFeed() {
+    // 2. Safe background fetch that NEVER touches the screen if there is any error
+    setTimeout(async () => {
       try {
         const res = await fetch('today.json?t=' + Date.now());
-        if (!res.ok) throw new Error("today.json not reachable");
-        const cloudData = await res.json();
-        
-        // Safety guard: only replace if valid data exists inside today.json
-        if (cloudData && (cloudData.allStocks || cloudData.buys)) {
-          applyData(cloudData, "Automated Cloud Sync (today.json)");
+        if (!res.ok) return;
+        const text = await res.text();
+        if (!text || text.trim().length === 0) return;
+        const cloudData = JSON.parse(text);
+        if (cloudData && Array.isArray(cloudData.buys) && cloudData.buys.length > 0) {
+          applyData(cloudData, "Automated Cloud Sync");
         }
-      } catch (err) {
-        console.log("Using active market session baseline:", err.message);
+      } catch (e) {
+        // Silently keep displaying fallbackData without clearing anything
       }
-    }
-
-    loadDailyFeed();
+    }, 1000);
   </script>
 </body>
 </html>
