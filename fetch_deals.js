@@ -13,7 +13,6 @@ function fetchBuffer(url, headers = {}) {
     };
 
     const req = https.get(url, { headers: defaultHeaders, timeout: 15000 }, (res) => {
-      // Follow standard redirects (301, 302, 307)
       if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
         return fetchBuffer(res.headers.location, headers).then(resolve).catch(reject);
       }
@@ -42,7 +41,6 @@ function getRecentTradingDates(daysBack = 5) {
   let d = new Date();
   while (dates.length < daysBack) {
     const day = d.getDay();
-    // Skip weekends (0 = Sun, 6 = Sat)
     if (day !== 0 && day !== 6) {
       const yyyy = d.getFullYear();
       const mm = String(d.getMonth() + 1).padStart(2, '0');
@@ -63,10 +61,7 @@ async function downloadLatestBhavcopy() {
   for (const dateObj of recentDates) {
     const { yyyy, mm, dd, mon } = dateObj;
     
-    // NSE Bhavcopy URLs
-    // URL Pattern 1: Modern UDiFF Bhavcopy CSV (BhavCopy_NSE_CM_0_0_0_YYYYMMDD_F_0000.csv)
     const udiffUrl = `https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_${yyyy}${mm}${dd}_F_0000.csv`;
-    // URL Pattern 2: Standard PR Bhavcopy (sec_bhavdata_full_DDMMYYYY.csv)
     const prUrl = `https://nsearchives.nseindia.com/products/content/sec_bhavdata_full_${dd}${mm}${yyyy}.csv`;
 
     console.log(`Attempting Bhavcopy scan for session date: ${dd}-${mm}-${yyyy}...`);
@@ -107,7 +102,6 @@ async function runCollector() {
   const header = lines[0].split(',').map(h => h.trim().toUpperCase());
   const rows = lines.slice(1);
 
-  // Column Index Resolvers
   const getIdx = (candidates) => header.findIndex(h => candidates.includes(h));
 
   const symIdx = getIdx(['TckrSymb', 'SYMBOL']);
@@ -129,7 +123,7 @@ async function runCollector() {
     if (cols.length < header.length) continue;
 
     const series = cols[seriesIdx];
-    // Filter strictly for standard equity shares ('EQ') to omit bonds, debentures, or warrants
+    // Filter strictly for standard equity shares ('EQ')
     if (series !== 'EQ') continue;
 
     const sym = cols[symIdx];
@@ -139,17 +133,14 @@ async function runCollector() {
     const low = parseFloat(cols[lowIdx]) || ltp;
     const qty = parseFloat(cols[qtyIdx]) || 0;
     
-    // Determine turnover in Crore ₹
     let turnoverCr = 0;
     if (valIdx !== -1 && parseFloat(cols[valIdx])) {
       const rawVal = parseFloat(cols[valIdx]);
-      // If header is in Lacs vs Raw Currency
       turnoverCr = header[valIdx].includes('LACS') ? (rawVal / 100) : (rawVal / 10000000);
     } else {
       turnoverCr = (qty * ltp) / 10000000;
     }
 
-    // Inst. VWAP calculation
     let vwap = vwapIdx !== -1 ? parseFloat(cols[vwapIdx]) : 0;
     if (!vwap || isNaN(vwap) || vwap <= 0) {
       vwap = (high + low + ltp) / 3;
@@ -158,7 +149,6 @@ async function runCollector() {
     if (ltp <= 0 || prevClose <= 0 || qty <= 0) continue;
 
     const priceDiffPct = ((ltp - prevClose) / prevClose) * 100;
-    // Institutional net flow metric proportional to session participation and price delta
     const netFlow = parseFloat(((turnoverCr * priceDiffPct) / 100).toFixed(2));
     const momScore = parseFloat((priceDiffPct * Math.log10(Math.max(turnoverCr, 1) + 10)).toFixed(1));
     const signal = netFlow > 15 ? "STRONG BUY" : netFlow > 0 ? "BUY" : netFlow < -15 ? "STRONG SELL" : "SELL";
@@ -177,18 +167,22 @@ async function runCollector() {
 
   console.log(`Parsed complete stock universe: ${results.length} active listed equities.`);
 
+  // LIQUIDITY FILTER: Discard illiquid/penny stocks to keep today.json lightweight
+  const activeStocks = results.filter(s => s.ltp >= 10 && s.totalQty >= 10000);
+  console.log(`Filtered down to ${activeStocks.length} liquid, high-volume stocks.`);
+
   const output = {
     updatedAt: new Date().toISOString(),
-    totalStocksTraded: results.length,
-    allStocks: results.slice().sort((a, b) => b.netFlow - a.netFlow),
-    buys: results.filter(d => d.netFlow > 0).sort((a, b) => b.netFlow - a.netFlow),
-    sells: results.filter(d => d.netFlow < 0).sort((a, b) => a.netFlow - b.netFlow),
-    momUp: results.filter(d => d.momScore > 0).sort((a, b) => b.momScore - a.momScore),
-    momDown: results.filter(d => d.momScore < 0).sort((a, b) => a.momScore - b.momScore)
+    totalStocksTraded: activeStocks.length,
+    allStocks: activeStocks.slice().sort((a, b) => b.netFlow - a.netFlow),
+    buys: activeStocks.filter(d => d.netFlow > 0).sort((a, b) => b.netFlow - a.netFlow),
+    sells: activeStocks.filter(d => d.netFlow < 0).sort((a, b) => a.netFlow - b.netFlow),
+    momUp: activeStocks.filter(d => d.momScore > 0).sort((a, b) => b.momScore - a.momScore),
+    momDown: activeStocks.filter(d => d.momScore < 0).sort((a, b) => a.momScore - b.momScore)
   };
 
   fs.writeFileSync("today.json", JSON.stringify(output, null, 2));
-  console.log("today.json created with full market universe data.");
+  console.log("today.json created with filtered market universe data.");
 }
 
 runCollector();
