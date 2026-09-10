@@ -1,21 +1,20 @@
 const fs = require('fs');
 
-async function fetchWithTimeout(url, options = {}, timeoutMs = 8000) {
+async function fetchWithTimeout(url, options = {}, timeoutMs = 10000) {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const response = await fetch(url, { ...options, signal: controller.signal });
+    const res = await fetch(url, { ...options, signal: controller.signal });
     clearTimeout(id);
-    return response;
-  } catch (error) {
+    return res;
+  } catch (err) {
     clearTimeout(id);
-    throw error;
+    throw err;
   }
 }
 
-async function fetchNSEDeals() {
-  const url = "https://www.nseindia.com/api/snapshot-capital-market-largedeal?mode=bulk_deals";
-  
+async function runCollector() {
+  const dealsUrl = "https://www.nseindia.com/api/snapshot-capital-market-largedeal?mode=bulk_deals";
   const headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
     "Accept": "application/json, text/plain, */*",
@@ -27,70 +26,65 @@ async function fetchNSEDeals() {
 
   try {
     console.log("Connecting to NSE session gateway...");
-    const sessionRes = await fetchWithTimeout("https://www.nseindia.com", { headers }, 6000);
-    const setCookie = sessionRes.headers.get("set-cookie");
-    if (setCookie) {
-      headers["Cookie"] = setCookie.split(';')[0];
-    }
+    const initRes = await fetchWithTimeout("https://www.nseindia.com", { headers }, 8000);
+    const cookie = initRes.headers.get("set-cookie");
+    if (cookie) headers["Cookie"] = cookie.split(';')[0];
 
-    console.log("Fetching deal data...");
-    const res = await fetchWithTimeout(url, { headers }, 8000);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = await res.json();
-    deals = json.data || [];
-    console.log(`Fetched ${deals.length} records from exchange.`);
-  } catch (err) {
-    console.warn("Exchange network connection timed out or blocked by firewall:", err.message);
-    console.log("Generating structured market dataset from session base...");
+    console.log("Fetching finalized daily bulk/block deals...");
+    const res = await fetchWithTimeout(dealsUrl, { headers }, 10000);
+    if (res.ok) {
+      const data = await res.json();
+      deals = data.data || [];
+      console.log(`Successfully fetched ${deals.length} deal records from the exchange.`);
+    } else {
+      console.warn(`Exchange response code: ${res.status}`);
+    }
+  } catch (e) {
+    console.warn("Connection attempt error:", e.message);
   }
 
   const stockMap = {};
 
-  if (deals.length > 0) {
-    deals.forEach(d => {
-      const sym = d.symbol;
-      const type = (d.buySell || "").toUpperCase();
-      const qty = parseFloat(d.qty) || 0;
-      const price = parseFloat(d.watp || d.price) || 0;
-      const valCr = (qty * price) / 10000000;
+  deals.forEach(d => {
+    const sym = d.symbol;
+    const type = (d.buySell || "").toUpperCase();
+    const qty = parseFloat(d.qty) || 0;
+    // Current executed market price / weighted traded price directly from NSE
+    const price = parseFloat(d.watp || d.price) || 0;
+    const valCr = (qty * price) / 10000000;
 
-      if (!sym || qty <= 0 || price <= 0) return;
+    if (!sym || qty <= 0 || price <= 0) return;
 
-      if (!stockMap[sym]) {
-        stockMap[sym] = { sym, price, totalQty: 0, buyVal: 0, sellVal: 0, weightedTotal: 0 };
-      }
+    if (!stockMap[sym]) {
+      stockMap[sym] = { sym, ltp: price, totalQty: 0, buyVal: 0, sellVal: 0, weightedTotal: 0 };
+    }
 
-      stockMap[sym].totalQty += qty;
-      stockMap[sym].weightedTotal += (price * qty);
+    stockMap[sym].totalQty += qty;
+    stockMap[sym].weightedTotal += (price * qty);
+    stockMap[sym].ltp = price; // Latest traded price from exchange
 
-      if (type.includes("BUY")) stockMap[sym].buyVal += valCr;
-      else if (type.includes("SELL")) stockMap[sym].sellVal += valCr;
-    });
-  }
-
-  let parsed = Object.values(stockMap).map(s => {
-    const netFlow = parseFloat((s.buyVal - s.sellVal).toFixed(2));
-    const totalTurnover = s.buyVal + s.sellVal;
-    const vwap = s.totalQty > 0 ? parseFloat((s.weightedTotal / s.totalQty).toFixed(2)) : s.price;
-    const ltp = parseFloat((s.price).toFixed(2));
-    const momScore = totalTurnover > 0 ? parseFloat(((netFlow / totalTurnover) * Math.log10(totalTurnover + 10) * 10).toFixed(1)) : 0;
-    let signal = netFlow > 20 ? "STRONG BUY" : netFlow > 0.05 ? "BUY" : netFlow < -20 ? "STRONG SELL" : "SELL";
-    return { sym: s.sym, ltp: ltp, vwap: vwap, price: ltp, netFlow, totalQty: s.totalQty, momScore, signal };
+    if (type.includes("BUY")) stockMap[sym].buyVal += valCr;
+    else if (type.includes("SELL")) stockMap[sym].sellVal += valCr;
   });
 
-  if (parsed.length === 0) {
-    parsed = [
-      { sym: "HDFCBANK", ltp: 1693.80, vwap: 1689.50, price: 1693.80, netFlow: 480.50, totalQty: 6925000, momScore: 9.4, signal: "STRONG BUY" },
-      { sym: "ICICIBANK", ltp: 1228.10, vwap: 1225.00, price: 1228.10, netFlow: 390.20, totalQty: 3177000, momScore: 8.9, signal: "STRONG BUY" },
-      { sym: "BHARTIARTL", ltp: 1540.30, vwap: 1535.40, price: 1540.30, netFlow: 290.00, totalQty: 1882000, momScore: 8.2, signal: "STRONG BUY" },
-      { sym: "L&T", ltp: 3620.00, vwap: 3612.00, price: 3620.00, netFlow: 275.40, totalQty: 760000, momScore: 7.9, signal: "STRONG BUY" },
-      { sym: "M&M", ltp: 2740.00, vwap: 2730.50, price: 2740.00, netFlow: 260.00, totalQty: 948000, momScore: 8.8, signal: "STRONG BUY" },
-      { sym: "INFY", ltp: 1845.20, vwap: 1852.00, price: 1845.20, netFlow: -310.00, totalQty: 1680000, momScore: -9.1, signal: "STRONG SELL" },
-      { sym: "TCS", ltp: 4210.00, vwap: 4225.00, price: 4210.00, netFlow: -240.00, totalQty: 570000, momScore: -8.3, signal: "STRONG SELL" },
-      { sym: "TATAMOTORS", ltp: 975.20, vwap: 981.40, price: 975.20, netFlow: -195.00, totalQty: 2000000, momScore: -7.6, signal: "STRONG SELL" },
-      { sym: "KOTAKBANK", ltp: 1790.50, vwap: 1798.00, price: 1790.50, netFlow: -180.00, totalQty: 1005000, momScore: -6.9, signal: "STRONG SELL" }
-    ];
-  }
+  const parsed = Object.values(stockMap).map(s => {
+    const netFlow = parseFloat((s.buyVal - s.sellVal).toFixed(2));
+    const totalTurnover = s.buyVal + s.sellVal;
+    const vwap = s.totalQty > 0 ? parseFloat((s.weightedTotal / s.totalQty).toFixed(2)) : s.ltp;
+    const ltp = parseFloat(s.ltp.toFixed(2));
+    const momScore = totalTurnover > 0 ? parseFloat(((netFlow / totalTurnover) * Math.log10(totalTurnover + 10) * 10).toFixed(1)) : 0;
+    let signal = netFlow > 20 ? "STRONG BUY" : netFlow > 0.05 ? "BUY" : netFlow < -20 ? "STRONG SELL" : "SELL";
+    
+    return {
+      sym: s.sym,
+      ltp: ltp,
+      vwap: vwap,
+      netFlow: netFlow,
+      totalQty: s.totalQty,
+      momScore: momScore,
+      signal: signal
+    };
+  });
 
   const output = {
     updatedAt: new Date().toISOString(),
@@ -103,7 +97,7 @@ async function fetchNSEDeals() {
   };
 
   fs.writeFileSync("today.json", JSON.stringify(output, null, 2));
-  console.log("today.json written successfully. Workflow completed.");
+  console.log(`today.json updated with ${parsed.length} institutionally active stocks.`);
 }
 
-fetchNSEDeals();
+runCollector();
