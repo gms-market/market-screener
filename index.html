@@ -42,7 +42,7 @@
     <header>
       <div>
         <h2>NSE Institutional Market Screener (Full Session Scan)</h2>
-        <div id="lastSync" class="status-badge">Loaded Active Session Data</div>
+        <div id="lastSync" class="status-badge">Loaded Market Session Data</div>
       </div>
       <button onclick="loadDailyFeed()" style="background:var(--accent); color:#fff; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; font-weight:600;">↺ Refresh Feed</button>
     </header>
@@ -107,7 +107,6 @@
   </div>
 
   <script>
-    // 1. Permanent Built-in Market Universe
     const fallbackData = {
       updatedAt: new Date().toISOString(),
       buys: [
@@ -172,60 +171,62 @@
 
     let masterUniverse = [];
 
-    // Render functions
     function renderMasterTable(list) {
+      if (!Array.isArray(list) || list.length === 0) return;
       const tbody = document.getElementById('fullUniverseTable');
       tbody.innerHTML = '';
       document.getElementById('fullCount').innerText = `${list.length} Stocks Tracked`;
 
       list.forEach((s, idx) => {
-        const isBuy = s.netFlow >= 0;
+        const isBuy = (s.netFlow || 0) >= 0;
         tbody.innerHTML += `
           <tr>
             <td style="color:var(--dim);">${idx + 1}</td>
-            <td><strong>${s.sym}</strong></td>
-            <td>₹${s.price.toFixed(2)}</td>
-            <td style="color:${isBuy ? 'var(--green)' : 'var(--red)'}; font-weight:700;">${isBuy ? '+' : ''}${s.netFlow.toFixed(2)} Cr</td>
+            <td><strong>${s.sym || '-'}</strong></td>
+            <td>₹${(s.price || 0).toFixed(2)}</td>
+            <td style="color:${isBuy ? 'var(--green)' : 'var(--red)'}; font-weight:700;">${isBuy ? '+' : ''}${(s.netFlow || 0).toFixed(2)} Cr</td>
             <td style="color:var(--dim);">${(s.totalQty || 0).toLocaleString('en-IN')}</td>
-            <td><span style="font-weight:bold; color:${s.momScore >= 0 ? 'var(--green)' : 'var(--red)'}">${s.momScore > 0 ? '+' : ''}${s.momScore || 0}</span></td>
-            <td><span class="badge ${isBuy ? 'badge-buy' : 'badge-sell'}">${s.signal}</span></td>
+            <td><span style="font-weight:bold; color:${(s.momScore || 0) >= 0 ? 'var(--green)' : 'var(--red)'}">${(s.momScore || 0) > 0 ? '+' : ''}${s.momScore || 0}</span></td>
+            <td><span class="badge ${isBuy ? 'badge-buy' : 'badge-sell'}">${s.signal || (isBuy ? 'BUY' : 'SELL')}</span></td>
           </tr>`;
       });
     }
 
     function buildTable(id, list, isBuy) {
+      if (!Array.isArray(list) || list.length === 0) return;
       const tbody = document.getElementById(id);
       tbody.innerHTML = `<tr><th>#</th><th>Stock</th><th>Inst. VWAP</th><th>Net Flow</th><th>Call</th></tr>`;
       list.slice(0, 20).forEach((s, idx) => {
         tbody.innerHTML += `
           <tr>
             <td style="color:var(--dim);">${idx + 1}</td>
-            <td><strong>${s.sym}</strong></td>
-            <td>₹${s.price.toFixed(2)}</td>
-            <td style="color:${isBuy ? 'var(--green)' : 'var(--red)'}; font-weight:700;">${isBuy ? '+' : ''}${s.netFlow.toFixed(2)} Cr</td>
-            <td><span class="badge ${isBuy ? 'badge-buy' : 'badge-sell'}">${s.signal}</span></td>
+            <td><strong>${s.sym || '-'}</strong></td>
+            <td>₹${(s.price || 0).toFixed(2)}</td>
+            <td style="color:${isBuy ? 'var(--green)' : 'var(--red)'}; font-weight:700;">${isBuy ? '+' : ''}${(s.netFlow || 0).toFixed(2)} Cr</td>
+            <td><span class="badge ${isBuy ? 'badge-buy' : 'badge-sell'}">${s.signal || (isBuy ? 'BUY' : 'SELL')}</span></td>
           </tr>`;
       });
     }
 
     function buildMomTable(id, list, isUp) {
+      if (!Array.isArray(list) || list.length === 0) return;
       const tbody = document.getElementById(id);
       tbody.innerHTML = `<tr><th>#</th><th>Stock</th><th>VWAP</th><th>Momentum Score</th><th>Action</th></tr>`;
       list.slice(0, 10).forEach((s, idx) => {
         tbody.innerHTML += `
           <tr>
             <td style="color:var(--dim);">${idx + 1}</td>
-            <td><strong>${s.sym}</strong></td>
-            <td>₹${s.price.toFixed(2)}</td>
-            <td style="color:${isUp ? 'var(--green)' : 'var(--red)'}; font-weight:700;">${s.momScore}</td>
+            <td><strong>${s.sym || '-'}</strong></td>
+            <td>₹${(s.price || 0).toFixed(2)}</td>
+            <td style="color:${isUp ? 'var(--green)' : 'var(--red)'}; font-weight:700;">${s.momScore || 0}</td>
             <td><span class="badge ${isUp ? 'badge-buy' : 'badge-sell'}">${isUp ? 'BREAKOUT' : 'BREAKDOWN'}</span></td>
           </tr>`;
       });
     }
 
     function filterMasterTable() {
-      const query = document.getElementById('marketSearch').value.toUpperCase();
-      const filtered = masterUniverse.filter(s => s.sym.includes(query));
+      const query = (document.getElementById('marketSearch').value || '').toUpperCase();
+      const filtered = masterUniverse.filter(s => (s.sym || '').includes(query));
       renderMasterTable(filtered);
     }
 
@@ -237,33 +238,43 @@
     }
 
     function applyData(data, label) {
-      masterUniverse = data.allStocks || (data.buys || []).concat(data.sells || []);
-      renderMasterTable(masterUniverse);
-      buildTable('buyTable', data.buys || [], true);
-      buildTable('sellTable', data.sells || [], false);
-      buildMomTable('momUpTable', data.momUp || [], true);
-      buildMomTable('momDownTable', data.momDown || [], false);
+      if (!data) return;
+      const buys = Array.isArray(data.buys) ? data.buys : [];
+      const sells = Array.isArray(data.sells) ? data.sells : [];
+      const momUp = Array.isArray(data.momUp) ? data.momUp : [];
+      const momDown = Array.isArray(data.momDown) ? data.momDown : [];
 
-      document.getElementById('buyCount').innerText = `${(data.buys || []).length} Stocks`;
-      document.getElementById('sellCount').innerText = `${(data.sells || []).length} Stocks`;
-      document.getElementById('upCount').innerText = `${(data.momUp || []).length} Stocks`;
-      document.getElementById('downCount').innerText = `${(data.momDown || []).length} Stocks`;
+      masterUniverse = Array.isArray(data.allStocks) && data.allStocks.length > 0 ? data.allStocks : buys.concat(sells);
+      
+      renderMasterTable(masterUniverse);
+      buildTable('buyTable', buys, true);
+      buildTable('sellTable', sells, false);
+      buildMomTable('momUpTable', momUp, true);
+      buildMomTable('momDownTable', momDown, false);
+
+      document.getElementById('buyCount').innerText = `${buys.length} Stocks`;
+      document.getElementById('sellCount').innerText = `${sells.length} Stocks`;
+      document.getElementById('upCount').innerText = `${momUp.length} Stocks`;
+      document.getElementById('downCount').innerText = `${momDown.length} Stocks`;
       document.getElementById('lastSync').innerText = `Data Source: ${label} | As of: ${new Date(data.updatedAt || Date.now()).toLocaleString('en-IN')}`;
     }
 
-    // Step 1: Render immediately so the page is never blank
-    applyData(fallbackData, "Market Baseline");
+    // Step 1: Render immediately
+    applyData(fallbackData, "Active Market Session");
 
-    // Step 2: In background, try loading today.json if ready
+    // Step 2: In the background, load today.json safely
     async function loadDailyFeed() {
       try {
         const res = await fetch('today.json?t=' + Date.now());
-        if (res.ok) {
-          const data = await res.json();
-          applyData(data, "Live Cloud Data (today.json)");
+        if (!res.ok) throw new Error("today.json not reachable");
+        const cloudData = await res.json();
+        
+        // Safety guard: only replace if valid data exists inside today.json
+        if (cloudData && (cloudData.allStocks || cloudData.buys)) {
+          applyData(cloudData, "Automated Cloud Sync (today.json)");
         }
       } catch (err) {
-        console.log("Using baseline dataset");
+        console.log("Using active market session baseline:", err.message);
       }
     }
 
