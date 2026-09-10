@@ -256,7 +256,23 @@
       document.getElementById('sellCount').innerText = `${sells.length} Stocks`;
       document.getElementById('upCount').innerText = `${momUp.length} Stocks`;
       document.getElementById('downCount').innerText = `${momDown.length} Stocks`;
-      document.getElementById('lastSync').innerText = `Data Source: ${label} | As of: ${new Date(data.updatedAt || Date.now()).toLocaleString('en-IN')}`;
+      function updateClock() {
+      const now = new Date();
+      const currentFormatted = now.toLocaleString('en-IN', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+      });
+      document.getElementById('lastSync').innerText = `Market Session: Post-Close (06:30 PM Cut-off) | Live View: ${currentFormatted}`;
+    }
+
+    // Call it immediately and update every second
+    updateClock();
+    setInterval(updateClock, 1000);
     }
 
     // 1. Render permanently on page load
