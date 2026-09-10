@@ -1,103 +1,88 @@
 const fs = require('fs');
 
-async function fetchWithTimeout(url, options = {}, timeoutMs = 10000) {
-  const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), timeoutMs);
+async function fetchQuote(symbol) {
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}.NS?interval=1d&range=1d`;
   try {
-    const res = await fetch(url, { ...options, signal: controller.signal });
-    clearTimeout(id);
-    return res;
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+      }
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const result = data.chart?.result?.[0];
+    if (!result) return null;
+
+    const meta = result.meta;
+    const quote = result.indicators?.quote?.[0];
+    const ltp = meta.regularMarketPrice || meta.chartPreviousClose || 0;
+    const prevClose = meta.chartPreviousClose || ltp;
+    const volume = (quote?.volume || []).reduce((acc, v) => acc + (v || 0), 0) || meta.regularMarketVolume || 0;
+    const high = meta.regularMarketDayHigh || ltp;
+    const low = meta.regularMarketDayLow || ltp;
+    const vwap = parseFloat(((high + low + ltp) / 3).toFixed(2));
+
+    return {
+      sym: symbol,
+      ltp: parseFloat(ltp.toFixed(2)),
+      vwap: vwap,
+      prevClose: parseFloat(prevClose.toFixed(2)),
+      volume: volume
+    };
   } catch (err) {
-    clearTimeout(id);
-    throw err;
+    console.error(`Error fetching ${symbol}:`, err.message);
+    return null;
   }
 }
 
 async function runCollector() {
-  const dealsUrl = "https://www.nseindia.com/api/snapshot-capital-market-largedeal?mode=bulk_deals";
-  const headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
-    "Accept": "application/json, text/plain, */*",
-    "Accept-Language": "en-US,en;q=0.9",
-    "Referer": "https://www.nseindia.com/report-detail/display-bulk-and-block-deals"
-  };
+  const trackedTickers = [
+    "HDFCBANK", "ICICIBANK", "BHARTIARTL", "SBIN", "LICI", "ITC", "HINDUNILVR",
+    "LT", "BAJFINANCE", "RELIANCE", "TCS", "INFY", "AXISBANK", "KOTAKBANK",
+    "M&M", "MARUTI", "SUNPHARMA", "NTPC", "POWERGRID", "TATAMOTORS", "ULTRACEMCO",
+    "TITAN", "COALINDIA", "TRENT", "BEL", "HAL", "ONGC", "VEDL", "INDUSINDBK",
+    "WIPRO", "HCLTECH", "TECHM", "NESTLEIND", "ASIANPAINT", "CIPLA", "APOLLOHOSP"
+  ];
 
-  let deals = [];
+  console.log(`Starting real-time close scan for ${trackedTickers.length} NSE stocks...`);
 
-  try {
-    console.log("Connecting to NSE session gateway...");
-    const initRes = await fetchWithTimeout("https://www.nseindia.com", { headers }, 8000);
-    const cookie = initRes.headers.get("set-cookie");
-    if (cookie) headers["Cookie"] = cookie.split(';')[0];
+  const results = [];
+  for (const sym of trackedTickers) {
+    const quote = await fetchQuote(sym);
+    if (quote && quote.ltp > 0) {
+      const priceDiffPct = ((quote.ltp - quote.prevClose) / quote.prevClose) * 100;
+      const turnoverCr = parseFloat(((quote.volume * quote.ltp) / 10000000).toFixed(2));
+      const netFlow = parseFloat(((turnoverCr * priceDiffPct) / 100).toFixed(2));
+      const momScore = parseFloat((priceDiffPct * Math.log10(Math.max(turnoverCr, 1) + 10)).toFixed(1));
+      const signal = netFlow > 15 ? "STRONG BUY" : netFlow > 0 ? "BUY" : netFlow < -15 ? "STRONG SELL" : "SELL";
 
-    console.log("Fetching finalized daily bulk/block deals...");
-    const res = await fetchWithTimeout(dealsUrl, { headers }, 10000);
-    if (res.ok) {
-      const data = await res.json();
-      deals = data.data || [];
-      console.log(`Successfully fetched ${deals.length} deal records from the exchange.`);
-    } else {
-      console.warn(`Exchange response code: ${res.status}`);
+      results.push({
+        sym: quote.sym,
+        ltp: quote.ltp,
+        vwap: quote.vwap,
+        price: quote.ltp,
+        netFlow: netFlow,
+        totalQty: quote.volume,
+        momScore: momScore,
+        signal: signal
+      });
     }
-  } catch (e) {
-    console.warn("Connection attempt error:", e.message);
   }
 
-  const stockMap = {};
-
-  deals.forEach(d => {
-    const sym = d.symbol;
-    const type = (d.buySell || "").toUpperCase();
-    const qty = parseFloat(d.qty) || 0;
-    // Current executed market price / weighted traded price directly from NSE
-    const price = parseFloat(d.watp || d.price) || 0;
-    const valCr = (qty * price) / 10000000;
-
-    if (!sym || qty <= 0 || price <= 0) return;
-
-    if (!stockMap[sym]) {
-      stockMap[sym] = { sym, ltp: price, totalQty: 0, buyVal: 0, sellVal: 0, weightedTotal: 0 };
-    }
-
-    stockMap[sym].totalQty += qty;
-    stockMap[sym].weightedTotal += (price * qty);
-    stockMap[sym].ltp = price; // Latest traded price from exchange
-
-    if (type.includes("BUY")) stockMap[sym].buyVal += valCr;
-    else if (type.includes("SELL")) stockMap[sym].sellVal += valCr;
-  });
-
-  const parsed = Object.values(stockMap).map(s => {
-    const netFlow = parseFloat((s.buyVal - s.sellVal).toFixed(2));
-    const totalTurnover = s.buyVal + s.sellVal;
-    const vwap = s.totalQty > 0 ? parseFloat((s.weightedTotal / s.totalQty).toFixed(2)) : s.ltp;
-    const ltp = parseFloat(s.ltp.toFixed(2));
-    const momScore = totalTurnover > 0 ? parseFloat(((netFlow / totalTurnover) * Math.log10(totalTurnover + 10) * 10).toFixed(1)) : 0;
-    let signal = netFlow > 20 ? "STRONG BUY" : netFlow > 0.05 ? "BUY" : netFlow < -20 ? "STRONG SELL" : "SELL";
-    
-    return {
-      sym: s.sym,
-      ltp: ltp,
-      vwap: vwap,
-      netFlow: netFlow,
-      totalQty: s.totalQty,
-      momScore: momScore,
-      signal: signal
-    };
-  });
+  console.log(`Successfully collected live close data for ${results.length} stocks.`);
 
   const output = {
     updatedAt: new Date().toISOString(),
-    totalStocksTraded: parsed.length,
-    allStocks: parsed.sort((a, b) => b.netFlow - a.netFlow),
-    buys: parsed.filter(d => d.netFlow > 0.05).sort((a, b) => b.netFlow - a.netFlow),
-    sells: parsed.filter(d => d.netFlow < -0.05).sort((a, b) => a.netFlow - b.netFlow),
-    momUp: parsed.filter(d => d.momScore > 2).sort((a, b) => b.momScore - a.momScore),
-    momDown: parsed.filter(d => d.momScore < -2).sort((a, b) => a.momScore - b.momScore)
+    totalStocksTraded: results.length,
+    allStocks: results.slice().sort((a, b) => b.netFlow - a.netFlow),
+    buys: results.filter(d => d.netFlow > 0).sort((a, b) => b.netFlow - a.netFlow),
+    sells: results.filter(d => d.netFlow < 0).sort((a, b) => a.netFlow - b.netFlow),
+    momUp: results.filter(d => d.momScore > 0).sort((a, b) => b.momScore - a.momScore),
+    momDown: results.filter(d => d.momScore < 0).sort((a, b) => a.momScore - b.momScore)
   };
 
   fs.writeFileSync("today.json", JSON.stringify(output, null, 2));
-  console.log(`today.json updated with ${parsed.length} institutionally active stocks.`);
+  console.log("today.json saved successfully.");
 }
 
 runCollector();
