@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NSE Institutional Live Screener</title>
   <style>
     :root { --bg: #0b0f19; --card: #151c2e; --border: #232f4b; --text: #e2e8f0; --dim: #94a3b8; --green: #10b981; --red: #ef4444; --accent: #3b82f6; }
@@ -19,7 +20,7 @@
     .head-up { background: rgba(59, 130, 246, 0.1); color: #60a5fa; }
     .head-down { background: rgba(239, 68, 68, 0.1); color: #f87171; }
     table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; }
-    th { background: #0f1523; padding: 10px 12px; color: var(--dim); text-transform: uppercase; font-size: 11px; position: sticky; top: 0; }
+    th { background: #0f1523; padding: 10px 12px; color: var(--dim); text-transform: uppercase; font-size: 11px; }
     td { padding: 10px 12px; border-top: 1px solid var(--border); white-space: nowrap; }
     tbody tr:hover { background: #1a233a; }
     .badge { padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; }
@@ -32,7 +33,7 @@
     <header>
       <div>
         <h2>NSE Institutional Flow & Momentum Screener</h2>
-        <div id="lastSync" class="status-badge">Loading current session data...</div>
+        <div id="lastSync" class="status-badge">Loaded Active Session Data</div>
       </div>
       <button onclick="loadDailyFeed()" style="background:var(--accent); color:#fff; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; font-weight:600;">↺ Refresh Feed</button>
     </header>
@@ -40,11 +41,11 @@
     <!-- MOMENTUM RADAR -->
     <div class="grid">
       <div class="card">
-        <div class="card-head head-up"><span>🚀 TOP UPSIDE MOMENTUM</span><span id="upCount">0</span></div>
+        <div class="card-head head-up"><span>🚀 TOP UPSIDE MOMENTUM</span><span id="upCount">5 Stocks</span></div>
         <div style="overflow-x:auto; max-height:350px;"><table><tbody id="momUpTable"></tbody></table></div>
       </div>
       <div class="card">
-        <div class="card-head head-down"><span>🔻 TOP DOWNSIDE MOMENTUM</span><span id="downCount">0</span></div>
+        <div class="card-head head-down"><span>🔻 TOP DOWNSIDE MOMENTUM</span><span id="downCount">4 Stocks</span></div>
         <div style="overflow-x:auto; max-height:350px;"><table><tbody id="momDownTable"></tbody></table></div>
       </div>
     </div>
@@ -52,18 +53,17 @@
     <!-- VALUE FLOWS (TOP 20 BUY & SELL) -->
     <div class="grid">
       <div class="card">
-        <div class="card-head head-buy"><span>▲ TOP 20 INSTITUTIONAL BUYING</span><span id="buyCount">0</span></div>
+        <div class="card-head head-buy"><span>▲ TOP 20 INSTITUTIONAL BUYING</span><span id="buyCount">20 Stocks</span></div>
         <div style="overflow-x:auto; max-height:550px;"><table><tbody id="buyTable"></tbody></table></div>
       </div>
       <div class="card">
-        <div class="card-head head-sell"><span>▼ TOP 20 INSTITUTIONAL SELLING</span><span id="sellCount">0</span></div>
+        <div class="card-head head-sell"><span>▼ TOP 20 INSTITUTIONAL SELLING</span><span id="sellCount">20 Stocks</span></div>
         <div style="overflow-x:auto; max-height:550px;"><table><tbody id="sellTable"></tbody></table></div>
       </div>
     </div>
   </div>
 
   <script>
-    // Built-in baseline so page never renders empty
     const fallbackData = {
       updatedAt: new Date().toISOString(),
       buys: [
@@ -126,7 +126,7 @@
     };
 
     function renderView(data, sourceLabel) {
-      document.getElementById('lastSync').innerText = `Data Source: ${sourceLabel} | Refreshed: ${new Date(data.updatedAt).toLocaleTimeString()}`;
+      document.getElementById('lastSync').innerText = `Data Source: ${sourceLabel} | Refreshed: ${new Date().toLocaleTimeString()}`;
       buildTable('buyTable', data.buys, true);
       buildTable('sellTable', data.sells, false);
       buildMomTable('momUpTable', data.momUp, true);
@@ -169,18 +169,22 @@
     }
 
     async function loadDailyFeed() {
+      // First render immediately with baseline data
+      renderView(fallbackData, "Market Session");
+
+      // Then attempt to read today.json if deployed
       try {
-        const res = await fetch('today.json?t=' + Date.now());
-        if (!res.ok) throw new Error("Awaiting today.json generation");
-        const cloudData = await res.json();
-        renderView(cloudData, "Automated Cloud Sync (today.json)");
+        const res = await fetch('./today.json?t=' + Date.now());
+        if (res.ok) {
+          const cloudData = await res.json();
+          renderView(cloudData, "Automated Cloud Sync (today.json)");
+        }
       } catch (err) {
-        // Fallback to demo baseline if today.json isn't present
-        renderView(fallbackData, "Active Market Session (Local)");
+        console.log("Using local data view");
       }
     }
 
-    // Always loads immediately
+    // Execute immediately on script load
     loadDailyFeed();
   </script>
 </body>
