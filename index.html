@@ -22,7 +22,7 @@
     .status-badge { font-size: 12px; color: var(--dim); margin-top: 4px; }
     
     .toolbar { display: flex; justify-content: space-between; align-items: center; background: var(--card); border: 1px solid var(--border); padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
-    .search-input { background: #0b0f19; border: 1px solid var(--border); color: #fff; padding: 8px 14px; border-radius: 6px; outline: none; font-size: 13px; width: 280px; }
+    .search-input { background: #0b0f19; border: 1px solid var(--border); color: #fff; padding: 8px 14px; border-radius: 6px; outline: none; font-size: 13px; width: 300px; }
     .btn-toggle { background: #232f4b; color: var(--text); border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; }
     .btn-toggle.active { background: var(--accent); color: #fff; }
 
@@ -38,7 +38,7 @@
     .head-down { background: rgba(239, 68, 68, 0.1); color: #f87171; }
     
     table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; }
-    th { background: #0f1523; padding: 10px 12px; color: var(--dim); text-transform: uppercase; font-size: 11px; position: sticky; top: 0; }
+    th { background: #0f1523; padding: 10px 12px; color: var(--dim); text-transform: uppercase; font-size: 11px; position: sticky; top: 0; z-index: 2; }
     td { padding: 10px 12px; border-top: 1px solid var(--border); white-space: nowrap; }
     tbody tr:hover { background: #1a233a; }
     .badge { padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; }
@@ -46,13 +46,17 @@
     .badge-sell { background: rgba(239, 68, 68, 0.15); color: var(--red); border: 1px solid var(--red); }
     .cur-price { color: #f8fafc; font-weight: 600; }
     .vwap-price { color: var(--dim); }
+
+    .load-more-container { padding: 14px; text-align: center; border-top: 1px solid var(--border); background: var(--card); }
+    .btn-more { background: #232f4b; color: #fff; border: 1px solid var(--border); padding: 8px 18px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; }
+    .btn-more:hover { background: var(--accent); }
   </style>
 </head>
 <body>
   <div class="wrapper">
     <header>
       <div>
-        <h2>NSE Institutional Market Screener (Full Session Scan)</h2>
+        <h2>NSE Institutional Market Screener (Full Universe)</h2>
         <div id="lastSync" class="status-badge">Connecting to market feed...</div>
       </div>
       <button onclick="loadDailyFeed()" style="background:var(--accent); color:#fff; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; font-weight:600;">↺ Refresh Feed</button>
@@ -63,16 +67,16 @@
         <button class="btn-toggle active" id="btnViewAll" onclick="setView('ALL')">Full Market Universe</button>
         <button class="btn-toggle" id="btnViewSplit" onclick="setView('SPLIT')">Top 20 Leaderboards</button>
       </div>
-      <input type="text" id="marketSearch" class="search-input" placeholder="Search any stock ticker..." onkeyup="filterMasterTable()">
+      <input type="text" id="marketSearch" class="search-input" placeholder="Search by stock symbol (e.g., RELIANCE)..." oninput="debounceFilter()">
     </div>
 
-    <!-- VIEW 1: FULL MARKET UNIVERSE (ALL STOCKS) -->
+    <!-- VIEW 1: FULL MARKET UNIVERSE -->
     <div id="fullMarketView" class="card" style="margin-bottom: 24px;">
       <div class="card-head head-all">
-        <span>ALL INSTITUTIONALLY TRADED STOCKS (MARKET CLOSE SCAN)</span>
+        <span>ALL EQUITIES TRADED IN SESSION</span>
         <span id="fullCount">0 Stocks Tracked</span>
       </div>
-      <div style="overflow-x:auto; max-height: 700px;">
+      <div style="overflow-x:auto; max-height: 650px;">
         <table>
           <thead>
             <tr>
@@ -88,6 +92,9 @@
           </thead>
           <tbody id="fullUniverseTable"></tbody>
         </table>
+      </div>
+      <div class="load-more-container" id="loadMoreBox" style="display:none;">
+        <button class="btn-more" onclick="renderMoreRows()">Load More Stocks</button>
       </div>
     </div>
 
@@ -118,74 +125,25 @@
   </div>
 
   <script>
-    // Live Market Session Dataset
-    const initialSessionData = {
-      buys: [
-        { sym: "HDFCBANK", ltp: 693.80, vwap: 691.50, netFlow: 480.50, totalQty: 6925000, momScore: 9.4, signal: "STRONG BUY" },
-        { sym: "ICICIBANK", ltp: 1228.10, vwap: 1225.00, netFlow: 390.20, totalQty: 3177000, momScore: 8.9, signal: "STRONG BUY" },
-        { sym: "BHARTIARTL", ltp: 1814.70, vwap: 1810.00, netFlow: 290.00, totalQty: 1882000, momScore: 8.2, signal: "STRONG BUY" },
-        { sym: "L&T", ltp: 3620.00, vwap: 3612.00, netFlow: 275.40, totalQty: 760000, momScore: 7.9, signal: "STRONG BUY" },
-        { sym: "M&M", ltp: 2740.00, vwap: 2730.50, netFlow: 260.00, totalQty: 948000, momScore: 8.8, signal: "STRONG BUY" },
-        { sym: "NTPC", ltp: 334.50, vwap: 333.20, netFlow: 220.80, totalQty: 5584000, momScore: 7.1, signal: "STRONG BUY" },
-        { sym: "AXISBANK", ltp: 1195.00, vwap: 1190.80, netFlow: 210.00, totalQty: 1757000, momScore: 6.8, signal: "STRONG BUY" },
-        { sym: "SUNPHARMA", ltp: 1780.00, vwap: 1774.20, netFlow: 165.00, totalQty: 926000, momScore: 6.5, signal: "STRONG BUY" },
-        { sym: "POWERGRID", ltp: 328.00, vwap: 326.50, netFlow: 145.20, totalQty: 4426000, momScore: 6.2, signal: "STRONG BUY" },
-        { sym: "TRENT", ltp: 2820.00, vwap: 2810.00, netFlow: 135.00, totalQty: 189000, momScore: 6.0, signal: "BUY" },
-        { sym: "BEL", ltp: 298.50, vwap: 296.80, netFlow: 120.00, totalQty: 4020000, momScore: 5.7, signal: "BUY" },
-        { sym: "HAL", ltp: 4680.00, vwap: 4672.00, netFlow: 115.00, totalQty: 245000, momScore: 5.5, signal: "BUY" },
-        { sym: "ONGC", ltp: 295.20, vwap: 294.10, netFlow: 105.00, totalQty: 3556000, momScore: 5.2, signal: "BUY" },
-        { sym: "VEDL", ltp: 465.00, vwap: 462.80, netFlow: 98.00, totalQty: 2107000, momScore: 4.9, signal: "BUY" },
-        { sym: "COALINDIA", ltp: 431.00, vwap: 429.50, netFlow: 88.00, totalQty: 1777000, momScore: 4.5, signal: "BUY" },
-        { sym: "INDUSINDBK", ltp: 1445.00, vwap: 1440.00, netFlow: 82.00, totalQty: 567000, momScore: 4.2, signal: "BUY" },
-        { sym: "RELIANCE", ltp: 2980.50, vwap: 2975.00, netFlow: 80.00, totalQty: 805000, momScore: 4.0, signal: "BUY" },
-        { sym: "SBIN", ltp: 815.70, vwap: 812.20, netFlow: 75.00, totalQty: 919000, momScore: 3.8, signal: "BUY" },
-        { sym: "BAJFINANCE", ltp: 7120.00, vwap: 7100.00, netFlow: 68.00, totalQty: 95000, momScore: 3.5, signal: "BUY" }
-      ],
-      sells: [
-        { sym: "INFY", ltp: 1035.00, vwap: 1042.00, netFlow: -310.00, totalQty: 1680000, momScore: -9.1, signal: "STRONG SELL" },
-        { sym: "TCS", ltp: 2208.00, vwap: 2215.00, netFlow: -240.00, totalQty: 570000, momScore: -8.3, signal: "STRONG SELL" },
-        { sym: "TATAMOTORS", ltp: 975.20, vwap: 981.40, netFlow: -195.00, totalQty: 2000000, momScore: -7.6, signal: "STRONG SELL" },
-        { sym: "KOTAKBANK", ltp: 1790.50, vwap: 1798.00, netFlow: -180.00, totalQty: 1005000, momScore: -6.9, signal: "STRONG SELL" },
-        { sym: "TITAN", ltp: 3450.00, vwap: 3462.00, netFlow: -135.00, totalQty: 391000, momScore: -6.1, signal: "SELL" },
-        { sym: "WIPRO", ltp: 167.00, vwap: 168.50, netFlow: -125.00, totalQty: 2380000, momScore: -5.8, signal: "SELL" },
-        { sym: "HCLTECH", ltp: 1229.80, vwap: 1235.00, netFlow: -115.00, totalQty: 660000, momScore: -5.4, signal: "SELL" },
-        { sym: "TECHM", ltp: 1508.00, vwap: 1515.00, netFlow: -100.00, totalQty: 632000, momScore: -5.1, signal: "SELL" },
-        { sym: "NESTLEIND", ltp: 2480.00, vwap: 2492.00, netFlow: -95.00, totalQty: 383000, momScore: -4.8, signal: "SELL" },
-        { sym: "ASIANPAINT", ltp: 3120.00, vwap: 3135.00, netFlow: -90.00, totalQty: 288000, momScore: -4.5, signal: "SELL" },
-        { sym: "CIPLA", ltp: 1363.10, vwap: 1370.00, netFlow: -55.00, totalQty: 341000, momScore: -2.9, signal: "SELL" },
-        { sym: "APOLLOHOSP", ltp: 8967.00, vwap: 8990.00, netFlow: -45.00, totalQty: 65000, momScore: -2.5, signal: "SELL" }
-      ],
-      momUp: [
-        { sym: "HDFCBANK", ltp: 693.80, vwap: 691.50, momScore: 9.4 },
-        { sym: "ICICIBANK", ltp: 1228.10, vwap: 1225.00, momScore: 8.9 },
-        { sym: "M&M", ltp: 2740.00, vwap: 2730.50, momScore: 8.8 },
-        { sym: "BHARTIARTL", ltp: 1814.70, vwap: 1810.00, momScore: 8.2 },
-        { sym: "L&T", ltp: 3620.00, vwap: 3612.00, momScore: 7.9 }
-      ],
-      momDown: [
-        { sym: "INFY", ltp: 1035.00, vwap: 1042.00, momScore: -9.1 },
-        { sym: "TCS", ltp: 2208.00, vwap: 2215.00, momScore: -8.3 },
-        { sym: "TATAMOTORS", ltp: 975.20, vwap: 981.40, momScore: -7.6 },
-        { sym: "KOTAKBANK", ltp: 1790.50, vwap: 1798.00, momScore: -6.9 },
-        { sym: "TITAN", ltp: 3450.00, vwap: 3462.00, momScore: -6.1 }
-      ]
-    };
-
     let masterUniverse = [];
+    let currentFilteredList = [];
+    let displayedCount = 0;
+    const CHUNK_SIZE = 50;
 
-    function renderMasterTable(list) {
-      if (!Array.isArray(list) || list.length === 0) return;
-      const tbody = document.getElementById('fullUniverseTable');
-      tbody.innerHTML = '';
-      document.getElementById('fullCount').innerText = `${list.length} Stocks Tracked`;
+    function renderRowChunk(list, startIndex, count) {
+      const slice = list.slice(startIndex, startIndex + count);
+      const rows = [];
 
-      list.forEach((s, idx) => {
+      for (let i = 0; i < slice.length; i++) {
+        const s = slice[i];
+        const idx = startIndex + i + 1;
         const isBuy = (s.netFlow || 0) >= 0;
         const currentPrice = s.ltp || s.price || 0;
         const instVWAP = s.vwap || currentPrice;
-        tbody.innerHTML += `
+
+        rows.push(`
           <tr>
-            <td style="color:var(--dim);">${idx + 1}</td>
+            <td style="color:var(--dim);">${idx}</td>
             <td><strong>${s.sym || '-'}</strong></td>
             <td class="cur-price">₹${currentPrice.toFixed(2)}</td>
             <td class="vwap-price">₹${instVWAP.toFixed(2)}</td>
@@ -193,52 +151,90 @@
             <td style="color:var(--dim);">${(s.totalQty || 0).toLocaleString('en-IN')}</td>
             <td><span style="font-weight:bold; color:${(s.momScore || 0) >= 0 ? 'var(--green)' : 'var(--red)'}">${(s.momScore || 0) > 0 ? '+' : ''}${s.momScore || 0}</span></td>
             <td><span class="badge ${isBuy ? 'badge-buy' : 'badge-sell'}">${s.signal || (isBuy ? 'BUY' : 'SELL')}</span></td>
-          </tr>`;
-      });
+          </tr>`);
+      }
+      return rows.join('');
+    }
+
+    function initMasterTable(list) {
+      currentFilteredList = list;
+      displayedCount = 0;
+      const tbody = document.getElementById('fullUniverseTable');
+      tbody.innerHTML = '';
+      document.getElementById('fullCount').innerText = `${list.length} Stocks Tracked`;
+
+      if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 24px; color: var(--dim);">No matching stocks found.</td></tr>';
+        document.getElementById('loadMoreBox').style.display = 'none';
+        return;
+      }
+
+      renderMoreRows();
+    }
+
+    function renderMoreRows() {
+      const tbody = document.getElementById('fullUniverseTable');
+      const htmlChunk = renderRowChunk(currentFilteredList, displayedCount, CHUNK_SIZE);
+      tbody.insertAdjacentHTML('beforeend', htmlChunk);
+      displayedCount += CHUNK_SIZE;
+
+      document.getElementById('loadMoreBox').style.display = displayedCount < currentFilteredList.length ? 'block' : 'none';
     }
 
     function buildTable(id, list, isBuy) {
-      if (!Array.isArray(list) || list.length === 0) return;
+      if (!Array.isArray(list)) return;
       const tbody = document.getElementById(id);
-      tbody.innerHTML = `<tr><th>#</th><th>Stock</th><th>Current Price</th><th>Inst. VWAP</th><th>Net Flow</th><th>Call</th></tr>`;
-      list.slice(0, 20).forEach((s, idx) => {
+      const rows = [`<tr><th>#</th><th>Stock</th><th>Current Price</th><th>Inst. VWAP</th><th>Net Flow</th><th>Call</th></tr>`];
+      
+      const slice = list.slice(0, 20);
+      for (let i = 0; i < slice.length; i++) {
+        const s = slice[i];
         const currentPrice = s.ltp || s.price || 0;
         const instVWAP = s.vwap || currentPrice;
-        tbody.innerHTML += `
+        rows.push(`
           <tr>
-            <td style="color:var(--dim);">${idx + 1}</td>
+            <td style="color:var(--dim);">${i + 1}</td>
             <td><strong>${s.sym || '-'}</strong></td>
             <td class="cur-price">₹${currentPrice.toFixed(2)}</td>
             <td class="vwap-price">₹${instVWAP.toFixed(2)}</td>
             <td style="color:${isBuy ? 'var(--green)' : 'var(--red)'}; font-weight:700;">${isBuy ? '+' : ''}${(s.netFlow || 0).toFixed(2)} Cr</td>
             <td><span class="badge ${isBuy ? 'badge-buy' : 'badge-sell'}">${s.signal || (isBuy ? 'BUY' : 'SELL')}</span></td>
-          </tr>`;
-      });
+          </tr>`);
+      }
+      tbody.innerHTML = rows.join('');
     }
 
     function buildMomTable(id, list, isUp) {
-      if (!Array.isArray(list) || list.length === 0) return;
+      if (!Array.isArray(list)) return;
       const tbody = document.getElementById(id);
-      tbody.innerHTML = `<tr><th>#</th><th>Stock</th><th>Current Price</th><th>VWAP</th><th>Score</th><th>Action</th></tr>`;
-      list.slice(0, 10).forEach((s, idx) => {
+      const rows = [`<tr><th>#</th><th>Stock</th><th>Current Price</th><th>VWAP</th><th>Score</th><th>Action</th></tr>`];
+      
+      const slice = list.slice(0, 10);
+      for (let i = 0; i < slice.length; i++) {
+        const s = slice[i];
         const currentPrice = s.ltp || s.price || 0;
         const instVWAP = s.vwap || currentPrice;
-        tbody.innerHTML += `
+        rows.push(`
           <tr>
-            <td style="color:var(--dim);">${idx + 1}</td>
+            <td style="color:var(--dim);">${i + 1}</td>
             <td><strong>${s.sym || '-'}</strong></td>
             <td class="cur-price">₹${currentPrice.toFixed(2)}</td>
             <td class="vwap-price">₹${instVWAP.toFixed(2)}</td>
             <td style="color:${isUp ? 'var(--green)' : 'var(--red)'}; font-weight:700;">${s.momScore || 0}</td>
             <td><span class="badge ${isUp ? 'badge-buy' : 'badge-sell'}">${isUp ? 'BREAKOUT' : 'BREAKDOWN'}</span></td>
-          </tr>`;
-      });
+          </tr>`);
+      }
+      tbody.innerHTML = rows.join('');
     }
 
-    function filterMasterTable() {
-      const query = (document.getElementById('marketSearch').value || '').toUpperCase();
-      const filtered = masterUniverse.filter(s => (s.sym || '').includes(query));
-      renderMasterTable(filtered);
+    let filterTimeout;
+    function debounceFilter() {
+      clearTimeout(filterTimeout);
+      filterTimeout = setTimeout(() => {
+        const query = (document.getElementById('marketSearch').value || '').trim().toUpperCase();
+        const filtered = query ? masterUniverse.filter(s => (s.sym || '').includes(query)) : masterUniverse;
+        initMasterTable(filtered);
+      }, 150);
     }
 
     function setView(mode) {
@@ -250,35 +246,26 @@
 
     function applyData(data) {
       if (!data) return;
-      const buys = Array.isArray(data.buys) ? data.buys : [];
-      const sells = Array.isArray(data.sells) ? data.sells : [];
-      const momUp = Array.isArray(data.momUp) ? data.momUp : [];
-      const momDown = Array.isArray(data.momDown) ? data.momDown : [];
-
       const candidateList = (Array.isArray(data.allStocks) && data.allStocks.length > 0) 
                             ? data.allStocks 
-                            : buys.concat(sells);
+                            : (data.buys || []).concat(data.sells || []);
       
-      // CRITICAL GUARD: Never wipe the screen with an empty array!
       if (candidateList.length === 0) return;
 
       masterUniverse = candidateList;
-      renderMasterTable(masterUniverse);
-      buildTable('buyTable', buys, true);
-      buildTable('sellTable', sells, false);
-      buildMomTable('momUpTable', momUp, true);
-      buildMomTable('momDownTable', momDown, false);
+      initMasterTable(masterUniverse);
 
-      document.getElementById('buyCount').innerText = `${buys.length} Stocks`;
-      document.getElementById('sellCount').innerText = `${sells.length} Stocks`;
-      document.getElementById('upCount').innerText = `${momUp.length} Stocks`;
-      document.getElementById('downCount').innerText = `${momDown.length} Stocks`;
+      buildTable('buyTable', data.buys || [], true);
+      buildTable('sellTable', data.sells || [], false);
+      buildMomTable('momUpTable', data.momUp || [], true);
+      buildMomTable('momDownTable', data.momDown || [], false);
+
+      document.getElementById('buyCount').innerText = `${(data.buys || []).length} Stocks`;
+      document.getElementById('sellCount').innerText = `${(data.sells || []).length} Stocks`;
+      document.getElementById('upCount').innerText = `${(data.momUp || []).length} Stocks`;
+      document.getElementById('downCount').innerText = `${(data.momDown || []).length} Stocks`;
     }
 
-    // Step 1: Render initial dataset immediately
-    applyData(initialSessionData);
-
-    // Step 2: Live Clock
     function updateClock() {
       const now = new Date();
       const currentFormatted = now.toLocaleString('en-IN', {
@@ -295,27 +282,18 @@
     updateClock();
     setInterval(updateClock, 1000);
 
-    // Step 3: Protected Cloud Data Reader
     async function loadDailyFeed() {
       try {
         const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
         const url = basePath + 'today.json?t=' + Date.now();
         const res = await fetch(url);
         if (!res.ok) return;
-        const text = await res.text();
-        if (!text || text.trim().length === 0) return;
-        const cloudData = JSON.parse(text);
-
-        // STRICT GUARD: Only apply if cloud file contains at least one actual stock record
-        if (cloudData) {
-          const count = (cloudData.allStocks ? cloudData.allStocks.length : 0) + 
-                        (cloudData.buys ? cloudData.buys.length : 0);
-          if (count > 0) {
-            applyData(cloudData);
-          }
+        const cloudData = await res.json();
+        if (cloudData && ((cloudData.allStocks && cloudData.allStocks.length > 0) || (cloudData.buys && cloudData.buys.length > 0))) {
+          applyData(cloudData);
         }
       } catch (err) {
-        console.log("Maintaining stable view");
+        console.log("Maintaining session state");
       }
     }
 
