@@ -1,9 +1,1064 @@
 {
-  "updatedAt": "2026-09-10T18:37:51.753Z",
-  "totalStocksTraded": 0,
-  "allStocks": [],
-  "buys": [],
-  "sells": [],
-  "momUp": [],
-  "momDown": []
+  "updatedAt": "2026-09-10T18:53:54.233Z",
+  "totalStocksTraded": 35,
+  "allStocks": [
+    {
+      "sym": "HDFCBANK",
+      "ltp": 693.8,
+      "vwap": 691.5,
+      "price": 693.8,
+      "netFlow": 18.34,
+      "totalQty": 27103195,
+      "momScore": 3.2,
+      "signal": "STRONG BUY"
+    },
+    {
+      "sym": "BHARTIARTL",
+      "ltp": 1839,
+      "vwap": 1834,
+      "price": 1839,
+      "netFlow": 11.3,
+      "totalQty": 4588009,
+      "momScore": 3.9,
+      "signal": "BUY"
+    },
+    {
+      "sym": "POWERGRID",
+      "ltp": 271.75,
+      "vwap": 269.6,
+      "price": 271.75,
+      "netFlow": 7.35,
+      "totalQty": 12182950,
+      "momScore": 5.6,
+      "signal": "BUY"
+    },
+    {
+      "sym": "SBIN",
+      "ltp": 1009.7,
+      "vwap": 1007.53,
+      "price": 1009.7,
+      "netFlow": 5.11,
+      "totalQty": 5503573,
+      "momScore": 2.5,
+      "signal": "BUY"
+    },
+    {
+      "sym": "LT",
+      "ltp": 3955,
+      "vwap": 3943.5,
+      "price": 3955,
+      "netFlow": 4.49,
+      "totalQty": 1375980,
+      "momScore": 2.3,
+      "signal": "BUY"
+    },
+    {
+      "sym": "ONGC",
+      "ltp": 237.27,
+      "vwap": 237.56,
+      "price": 237.27,
+      "netFlow": 4.21,
+      "totalQty": 12770398,
+      "momScore": 3.5,
+      "signal": "BUY"
+    },
+    {
+      "sym": "AXISBANK",
+      "ltp": 1246,
+      "vwap": 1247.2,
+      "price": 1246,
+      "netFlow": 3.13,
+      "totalQty": 4150001,
+      "momScore": 1.6,
+      "signal": "BUY"
+    },
+    {
+      "sym": "TECHM",
+      "ltp": 1525.8,
+      "vwap": 1522.87,
+      "price": 1525.8,
+      "netFlow": 2.53,
+      "totalQty": 1405547,
+      "momScore": 2.8,
+      "signal": "BUY"
+    },
+    {
+      "sym": "ULTRACEMCO",
+      "ltp": 10979,
+      "vwap": 10938.67,
+      "price": 10979,
+      "netFlow": 2.16,
+      "totalQty": 270856,
+      "momScore": 1.8,
+      "signal": "BUY"
+    },
+    {
+      "sym": "KOTAKBANK",
+      "ltp": 416.55,
+      "vwap": 415.3,
+      "price": 416.55,
+      "netFlow": 1.99,
+      "totalQty": 7755240,
+      "momScore": 1.6,
+      "signal": "BUY"
+    },
+    {
+      "sym": "BAJFINANCE",
+      "ltp": 1043.5,
+      "vwap": 1042.9,
+      "price": 1043.5,
+      "netFlow": 1.65,
+      "totalQty": 3902180,
+      "momScore": 1.1,
+      "signal": "BUY"
+    },
+    {
+      "sym": "INFY",
+      "ltp": 1036.5,
+      "vwap": 1036.8,
+      "price": 1036.5,
+      "netFlow": 1.35,
+      "totalQty": 8997421,
+      "momScore": 0.4,
+      "signal": "BUY"
+    },
+    {
+      "sym": "COALINDIA",
+      "ltp": 432,
+      "vwap": 432.77,
+      "price": 432,
+      "netFlow": 0.88,
+      "totalQty": 8810184,
+      "momScore": 0.6,
+      "signal": "BUY"
+    },
+    {
+      "sym": "CIPLA",
+      "ltp": 1373.3,
+      "vwap": 1372.13,
+      "price": 1373.3,
+      "netFlow": 0.85,
+      "totalQty": 826130,
+      "momScore": 1.6,
+      "signal": "BUY"
+    },
+    {
+      "sym": "TITAN",
+      "ltp": 5021,
+      "vwap": 5005.5,
+      "price": 5021,
+      "netFlow": 0.54,
+      "totalQty": 336545,
+      "momScore": 0.7,
+      "signal": "BUY"
+    },
+    {
+      "sym": "ASIANPAINT",
+      "ltp": 2498.1,
+      "vwap": 2488.27,
+      "price": 2498.1,
+      "netFlow": 0.5,
+      "totalQty": 549310,
+      "momScore": 0.8,
+      "signal": "BUY"
+    },
+    {
+      "sym": "NTPC",
+      "ltp": 335,
+      "vwap": 334.6,
+      "price": 335,
+      "netFlow": 0.35,
+      "totalQty": 6905719,
+      "momScore": 0.4,
+      "signal": "BUY"
+    },
+    {
+      "sym": "TRENT",
+      "ltp": 2818.7,
+      "vwap": 2817.9,
+      "price": 2818.7,
+      "netFlow": -0.07,
+      "totalQty": 503792,
+      "momScore": -0.1,
+      "signal": "SELL"
+    },
+    {
+      "sym": "HINDUNILVR",
+      "ltp": 1942.3,
+      "vwap": 1942.77,
+      "price": 1942.3,
+      "netFlow": -0.33,
+      "totalQty": 1232298,
+      "momScore": -0.3,
+      "signal": "SELL"
+    },
+    {
+      "sym": "NESTLEIND",
+      "ltp": 1386.2,
+      "vwap": 1388.9,
+      "price": 1386.2,
+      "netFlow": -0.39,
+      "totalQty": 568935,
+      "momScore": -1,
+      "signal": "SELL"
+    },
+    {
+      "sym": "SUNPHARMA",
+      "ltp": 1861,
+      "vwap": 1858.93,
+      "price": 1861,
+      "netFlow": -0.46,
+      "totalQty": 1178437,
+      "momScore": -0.5,
+      "signal": "SELL"
+    },
+    {
+      "sym": "WIPRO",
+      "ltp": 166.3,
+      "vwap": 167.16,
+      "price": 166.3,
+      "netFlow": -0.67,
+      "totalQty": 9575225,
+      "momScore": -0.9,
+      "signal": "SELL"
+    },
+    {
+      "sym": "BEL",
+      "ltp": 405,
+      "vwap": 404.73,
+      "price": 405,
+      "netFlow": -0.87,
+      "totalQty": 8713653,
+      "momScore": -0.6,
+      "signal": "SELL"
+    },
+    {
+      "sym": "MARUTI",
+      "ltp": 12590,
+      "vwap": 12600,
+      "price": 12590,
+      "netFlow": -0.95,
+      "totalQty": 338598,
+      "momScore": -0.6,
+      "signal": "SELL"
+    },
+    {
+      "sym": "TCS",
+      "ltp": 2204.1,
+      "vwap": 2208.9,
+      "price": 2204.1,
+      "netFlow": -0.97,
+      "totalQty": 2490349,
+      "momScore": -0.5,
+      "signal": "SELL"
+    },
+    {
+      "sym": "INDUSINDBK",
+      "ltp": 993.3,
+      "vwap": 994.23,
+      "price": 993.3,
+      "netFlow": -1.03,
+      "totalQty": 972480,
+      "momScore": -2.2,
+      "signal": "SELL"
+    },
+    {
+      "sym": "LICI",
+      "ltp": 405.6,
+      "vwap": 405.2,
+      "price": 405.6,
+      "netFlow": -1.45,
+      "totalQty": 7665385,
+      "momScore": -1.2,
+      "signal": "SELL"
+    },
+    {
+      "sym": "VEDL",
+      "ltp": 269.05,
+      "vwap": 270.98,
+      "price": 269.05,
+      "netFlow": -1.65,
+      "totalQty": 4829415,
+      "momScore": -2.7,
+      "signal": "SELL"
+    },
+    {
+      "sym": "APOLLOHOSP",
+      "ltp": 8900,
+      "vwap": 8933,
+      "price": 8900,
+      "netFlow": -2.19,
+      "totalQty": 329159,
+      "momScore": -1.9,
+      "signal": "SELL"
+    },
+    {
+      "sym": "ITC",
+      "ltp": 259.3,
+      "vwap": 260.77,
+      "price": 259.3,
+      "netFlow": -2.6,
+      "totalQty": 17444123,
+      "momScore": -1.5,
+      "signal": "SELL"
+    },
+    {
+      "sym": "HAL",
+      "ltp": 4950,
+      "vwap": 4972.33,
+      "price": 4950,
+      "netFlow": -3.44,
+      "totalQty": 688326,
+      "momScore": -2.6,
+      "signal": "SELL"
+    },
+    {
+      "sym": "RELIANCE",
+      "ltp": 1274,
+      "vwap": 1275.2,
+      "price": 1274,
+      "netFlow": -4.63,
+      "totalQty": 9290437,
+      "momScore": -1.2,
+      "signal": "SELL"
+    },
+    {
+      "sym": "ICICIBANK",
+      "ltp": 1384.5,
+      "vwap": 1383.8,
+      "price": 1384.5,
+      "netFlow": -4.82,
+      "totalQty": 10520240,
+      "momScore": -1,
+      "signal": "SELL"
+    },
+    {
+      "sym": "HCLTECH",
+      "ltp": 1207,
+      "vwap": 1213.63,
+      "price": 1207,
+      "netFlow": -4.92,
+      "totalQty": 2197675,
+      "momScore": -4.5,
+      "signal": "SELL"
+    },
+    {
+      "sym": "M&M",
+      "ltp": 3123.8,
+      "vwap": 3122.8,
+      "price": 3123.8,
+      "netFlow": -5.56,
+      "totalQty": 2140293,
+      "momScore": -2.4,
+      "signal": "SELL"
+    }
+  ],
+  "buys": [
+    {
+      "sym": "HDFCBANK",
+      "ltp": 693.8,
+      "vwap": 691.5,
+      "price": 693.8,
+      "netFlow": 18.34,
+      "totalQty": 27103195,
+      "momScore": 3.2,
+      "signal": "STRONG BUY"
+    },
+    {
+      "sym": "BHARTIARTL",
+      "ltp": 1839,
+      "vwap": 1834,
+      "price": 1839,
+      "netFlow": 11.3,
+      "totalQty": 4588009,
+      "momScore": 3.9,
+      "signal": "BUY"
+    },
+    {
+      "sym": "POWERGRID",
+      "ltp": 271.75,
+      "vwap": 269.6,
+      "price": 271.75,
+      "netFlow": 7.35,
+      "totalQty": 12182950,
+      "momScore": 5.6,
+      "signal": "BUY"
+    },
+    {
+      "sym": "SBIN",
+      "ltp": 1009.7,
+      "vwap": 1007.53,
+      "price": 1009.7,
+      "netFlow": 5.11,
+      "totalQty": 5503573,
+      "momScore": 2.5,
+      "signal": "BUY"
+    },
+    {
+      "sym": "LT",
+      "ltp": 3955,
+      "vwap": 3943.5,
+      "price": 3955,
+      "netFlow": 4.49,
+      "totalQty": 1375980,
+      "momScore": 2.3,
+      "signal": "BUY"
+    },
+    {
+      "sym": "ONGC",
+      "ltp": 237.27,
+      "vwap": 237.56,
+      "price": 237.27,
+      "netFlow": 4.21,
+      "totalQty": 12770398,
+      "momScore": 3.5,
+      "signal": "BUY"
+    },
+    {
+      "sym": "AXISBANK",
+      "ltp": 1246,
+      "vwap": 1247.2,
+      "price": 1246,
+      "netFlow": 3.13,
+      "totalQty": 4150001,
+      "momScore": 1.6,
+      "signal": "BUY"
+    },
+    {
+      "sym": "TECHM",
+      "ltp": 1525.8,
+      "vwap": 1522.87,
+      "price": 1525.8,
+      "netFlow": 2.53,
+      "totalQty": 1405547,
+      "momScore": 2.8,
+      "signal": "BUY"
+    },
+    {
+      "sym": "ULTRACEMCO",
+      "ltp": 10979,
+      "vwap": 10938.67,
+      "price": 10979,
+      "netFlow": 2.16,
+      "totalQty": 270856,
+      "momScore": 1.8,
+      "signal": "BUY"
+    },
+    {
+      "sym": "KOTAKBANK",
+      "ltp": 416.55,
+      "vwap": 415.3,
+      "price": 416.55,
+      "netFlow": 1.99,
+      "totalQty": 7755240,
+      "momScore": 1.6,
+      "signal": "BUY"
+    },
+    {
+      "sym": "BAJFINANCE",
+      "ltp": 1043.5,
+      "vwap": 1042.9,
+      "price": 1043.5,
+      "netFlow": 1.65,
+      "totalQty": 3902180,
+      "momScore": 1.1,
+      "signal": "BUY"
+    },
+    {
+      "sym": "INFY",
+      "ltp": 1036.5,
+      "vwap": 1036.8,
+      "price": 1036.5,
+      "netFlow": 1.35,
+      "totalQty": 8997421,
+      "momScore": 0.4,
+      "signal": "BUY"
+    },
+    {
+      "sym": "COALINDIA",
+      "ltp": 432,
+      "vwap": 432.77,
+      "price": 432,
+      "netFlow": 0.88,
+      "totalQty": 8810184,
+      "momScore": 0.6,
+      "signal": "BUY"
+    },
+    {
+      "sym": "CIPLA",
+      "ltp": 1373.3,
+      "vwap": 1372.13,
+      "price": 1373.3,
+      "netFlow": 0.85,
+      "totalQty": 826130,
+      "momScore": 1.6,
+      "signal": "BUY"
+    },
+    {
+      "sym": "TITAN",
+      "ltp": 5021,
+      "vwap": 5005.5,
+      "price": 5021,
+      "netFlow": 0.54,
+      "totalQty": 336545,
+      "momScore": 0.7,
+      "signal": "BUY"
+    },
+    {
+      "sym": "ASIANPAINT",
+      "ltp": 2498.1,
+      "vwap": 2488.27,
+      "price": 2498.1,
+      "netFlow": 0.5,
+      "totalQty": 549310,
+      "momScore": 0.8,
+      "signal": "BUY"
+    },
+    {
+      "sym": "NTPC",
+      "ltp": 335,
+      "vwap": 334.6,
+      "price": 335,
+      "netFlow": 0.35,
+      "totalQty": 6905719,
+      "momScore": 0.4,
+      "signal": "BUY"
+    }
+  ],
+  "sells": [
+    {
+      "sym": "M&M",
+      "ltp": 3123.8,
+      "vwap": 3122.8,
+      "price": 3123.8,
+      "netFlow": -5.56,
+      "totalQty": 2140293,
+      "momScore": -2.4,
+      "signal": "SELL"
+    },
+    {
+      "sym": "HCLTECH",
+      "ltp": 1207,
+      "vwap": 1213.63,
+      "price": 1207,
+      "netFlow": -4.92,
+      "totalQty": 2197675,
+      "momScore": -4.5,
+      "signal": "SELL"
+    },
+    {
+      "sym": "ICICIBANK",
+      "ltp": 1384.5,
+      "vwap": 1383.8,
+      "price": 1384.5,
+      "netFlow": -4.82,
+      "totalQty": 10520240,
+      "momScore": -1,
+      "signal": "SELL"
+    },
+    {
+      "sym": "RELIANCE",
+      "ltp": 1274,
+      "vwap": 1275.2,
+      "price": 1274,
+      "netFlow": -4.63,
+      "totalQty": 9290437,
+      "momScore": -1.2,
+      "signal": "SELL"
+    },
+    {
+      "sym": "HAL",
+      "ltp": 4950,
+      "vwap": 4972.33,
+      "price": 4950,
+      "netFlow": -3.44,
+      "totalQty": 688326,
+      "momScore": -2.6,
+      "signal": "SELL"
+    },
+    {
+      "sym": "ITC",
+      "ltp": 259.3,
+      "vwap": 260.77,
+      "price": 259.3,
+      "netFlow": -2.6,
+      "totalQty": 17444123,
+      "momScore": -1.5,
+      "signal": "SELL"
+    },
+    {
+      "sym": "APOLLOHOSP",
+      "ltp": 8900,
+      "vwap": 8933,
+      "price": 8900,
+      "netFlow": -2.19,
+      "totalQty": 329159,
+      "momScore": -1.9,
+      "signal": "SELL"
+    },
+    {
+      "sym": "VEDL",
+      "ltp": 269.05,
+      "vwap": 270.98,
+      "price": 269.05,
+      "netFlow": -1.65,
+      "totalQty": 4829415,
+      "momScore": -2.7,
+      "signal": "SELL"
+    },
+    {
+      "sym": "LICI",
+      "ltp": 405.6,
+      "vwap": 405.2,
+      "price": 405.6,
+      "netFlow": -1.45,
+      "totalQty": 7665385,
+      "momScore": -1.2,
+      "signal": "SELL"
+    },
+    {
+      "sym": "INDUSINDBK",
+      "ltp": 993.3,
+      "vwap": 994.23,
+      "price": 993.3,
+      "netFlow": -1.03,
+      "totalQty": 972480,
+      "momScore": -2.2,
+      "signal": "SELL"
+    },
+    {
+      "sym": "TCS",
+      "ltp": 2204.1,
+      "vwap": 2208.9,
+      "price": 2204.1,
+      "netFlow": -0.97,
+      "totalQty": 2490349,
+      "momScore": -0.5,
+      "signal": "SELL"
+    },
+    {
+      "sym": "MARUTI",
+      "ltp": 12590,
+      "vwap": 12600,
+      "price": 12590,
+      "netFlow": -0.95,
+      "totalQty": 338598,
+      "momScore": -0.6,
+      "signal": "SELL"
+    },
+    {
+      "sym": "BEL",
+      "ltp": 405,
+      "vwap": 404.73,
+      "price": 405,
+      "netFlow": -0.87,
+      "totalQty": 8713653,
+      "momScore": -0.6,
+      "signal": "SELL"
+    },
+    {
+      "sym": "WIPRO",
+      "ltp": 166.3,
+      "vwap": 167.16,
+      "price": 166.3,
+      "netFlow": -0.67,
+      "totalQty": 9575225,
+      "momScore": -0.9,
+      "signal": "SELL"
+    },
+    {
+      "sym": "SUNPHARMA",
+      "ltp": 1861,
+      "vwap": 1858.93,
+      "price": 1861,
+      "netFlow": -0.46,
+      "totalQty": 1178437,
+      "momScore": -0.5,
+      "signal": "SELL"
+    },
+    {
+      "sym": "NESTLEIND",
+      "ltp": 1386.2,
+      "vwap": 1388.9,
+      "price": 1386.2,
+      "netFlow": -0.39,
+      "totalQty": 568935,
+      "momScore": -1,
+      "signal": "SELL"
+    },
+    {
+      "sym": "HINDUNILVR",
+      "ltp": 1942.3,
+      "vwap": 1942.77,
+      "price": 1942.3,
+      "netFlow": -0.33,
+      "totalQty": 1232298,
+      "momScore": -0.3,
+      "signal": "SELL"
+    },
+    {
+      "sym": "TRENT",
+      "ltp": 2818.7,
+      "vwap": 2817.9,
+      "price": 2818.7,
+      "netFlow": -0.07,
+      "totalQty": 503792,
+      "momScore": -0.1,
+      "signal": "SELL"
+    }
+  ],
+  "momUp": [
+    {
+      "sym": "POWERGRID",
+      "ltp": 271.75,
+      "vwap": 269.6,
+      "price": 271.75,
+      "netFlow": 7.35,
+      "totalQty": 12182950,
+      "momScore": 5.6,
+      "signal": "BUY"
+    },
+    {
+      "sym": "BHARTIARTL",
+      "ltp": 1839,
+      "vwap": 1834,
+      "price": 1839,
+      "netFlow": 11.3,
+      "totalQty": 4588009,
+      "momScore": 3.9,
+      "signal": "BUY"
+    },
+    {
+      "sym": "ONGC",
+      "ltp": 237.27,
+      "vwap": 237.56,
+      "price": 237.27,
+      "netFlow": 4.21,
+      "totalQty": 12770398,
+      "momScore": 3.5,
+      "signal": "BUY"
+    },
+    {
+      "sym": "HDFCBANK",
+      "ltp": 693.8,
+      "vwap": 691.5,
+      "price": 693.8,
+      "netFlow": 18.34,
+      "totalQty": 27103195,
+      "momScore": 3.2,
+      "signal": "STRONG BUY"
+    },
+    {
+      "sym": "TECHM",
+      "ltp": 1525.8,
+      "vwap": 1522.87,
+      "price": 1525.8,
+      "netFlow": 2.53,
+      "totalQty": 1405547,
+      "momScore": 2.8,
+      "signal": "BUY"
+    },
+    {
+      "sym": "SBIN",
+      "ltp": 1009.7,
+      "vwap": 1007.53,
+      "price": 1009.7,
+      "netFlow": 5.11,
+      "totalQty": 5503573,
+      "momScore": 2.5,
+      "signal": "BUY"
+    },
+    {
+      "sym": "LT",
+      "ltp": 3955,
+      "vwap": 3943.5,
+      "price": 3955,
+      "netFlow": 4.49,
+      "totalQty": 1375980,
+      "momScore": 2.3,
+      "signal": "BUY"
+    },
+    {
+      "sym": "ULTRACEMCO",
+      "ltp": 10979,
+      "vwap": 10938.67,
+      "price": 10979,
+      "netFlow": 2.16,
+      "totalQty": 270856,
+      "momScore": 1.8,
+      "signal": "BUY"
+    },
+    {
+      "sym": "AXISBANK",
+      "ltp": 1246,
+      "vwap": 1247.2,
+      "price": 1246,
+      "netFlow": 3.13,
+      "totalQty": 4150001,
+      "momScore": 1.6,
+      "signal": "BUY"
+    },
+    {
+      "sym": "KOTAKBANK",
+      "ltp": 416.55,
+      "vwap": 415.3,
+      "price": 416.55,
+      "netFlow": 1.99,
+      "totalQty": 7755240,
+      "momScore": 1.6,
+      "signal": "BUY"
+    },
+    {
+      "sym": "CIPLA",
+      "ltp": 1373.3,
+      "vwap": 1372.13,
+      "price": 1373.3,
+      "netFlow": 0.85,
+      "totalQty": 826130,
+      "momScore": 1.6,
+      "signal": "BUY"
+    },
+    {
+      "sym": "BAJFINANCE",
+      "ltp": 1043.5,
+      "vwap": 1042.9,
+      "price": 1043.5,
+      "netFlow": 1.65,
+      "totalQty": 3902180,
+      "momScore": 1.1,
+      "signal": "BUY"
+    },
+    {
+      "sym": "ASIANPAINT",
+      "ltp": 2498.1,
+      "vwap": 2488.27,
+      "price": 2498.1,
+      "netFlow": 0.5,
+      "totalQty": 549310,
+      "momScore": 0.8,
+      "signal": "BUY"
+    },
+    {
+      "sym": "TITAN",
+      "ltp": 5021,
+      "vwap": 5005.5,
+      "price": 5021,
+      "netFlow": 0.54,
+      "totalQty": 336545,
+      "momScore": 0.7,
+      "signal": "BUY"
+    },
+    {
+      "sym": "COALINDIA",
+      "ltp": 432,
+      "vwap": 432.77,
+      "price": 432,
+      "netFlow": 0.88,
+      "totalQty": 8810184,
+      "momScore": 0.6,
+      "signal": "BUY"
+    },
+    {
+      "sym": "INFY",
+      "ltp": 1036.5,
+      "vwap": 1036.8,
+      "price": 1036.5,
+      "netFlow": 1.35,
+      "totalQty": 8997421,
+      "momScore": 0.4,
+      "signal": "BUY"
+    },
+    {
+      "sym": "NTPC",
+      "ltp": 335,
+      "vwap": 334.6,
+      "price": 335,
+      "netFlow": 0.35,
+      "totalQty": 6905719,
+      "momScore": 0.4,
+      "signal": "BUY"
+    }
+  ],
+  "momDown": [
+    {
+      "sym": "HCLTECH",
+      "ltp": 1207,
+      "vwap": 1213.63,
+      "price": 1207,
+      "netFlow": -4.92,
+      "totalQty": 2197675,
+      "momScore": -4.5,
+      "signal": "SELL"
+    },
+    {
+      "sym": "VEDL",
+      "ltp": 269.05,
+      "vwap": 270.98,
+      "price": 269.05,
+      "netFlow": -1.65,
+      "totalQty": 4829415,
+      "momScore": -2.7,
+      "signal": "SELL"
+    },
+    {
+      "sym": "HAL",
+      "ltp": 4950,
+      "vwap": 4972.33,
+      "price": 4950,
+      "netFlow": -3.44,
+      "totalQty": 688326,
+      "momScore": -2.6,
+      "signal": "SELL"
+    },
+    {
+      "sym": "M&M",
+      "ltp": 3123.8,
+      "vwap": 3122.8,
+      "price": 3123.8,
+      "netFlow": -5.56,
+      "totalQty": 2140293,
+      "momScore": -2.4,
+      "signal": "SELL"
+    },
+    {
+      "sym": "INDUSINDBK",
+      "ltp": 993.3,
+      "vwap": 994.23,
+      "price": 993.3,
+      "netFlow": -1.03,
+      "totalQty": 972480,
+      "momScore": -2.2,
+      "signal": "SELL"
+    },
+    {
+      "sym": "APOLLOHOSP",
+      "ltp": 8900,
+      "vwap": 8933,
+      "price": 8900,
+      "netFlow": -2.19,
+      "totalQty": 329159,
+      "momScore": -1.9,
+      "signal": "SELL"
+    },
+    {
+      "sym": "ITC",
+      "ltp": 259.3,
+      "vwap": 260.77,
+      "price": 259.3,
+      "netFlow": -2.6,
+      "totalQty": 17444123,
+      "momScore": -1.5,
+      "signal": "SELL"
+    },
+    {
+      "sym": "LICI",
+      "ltp": 405.6,
+      "vwap": 405.2,
+      "price": 405.6,
+      "netFlow": -1.45,
+      "totalQty": 7665385,
+      "momScore": -1.2,
+      "signal": "SELL"
+    },
+    {
+      "sym": "RELIANCE",
+      "ltp": 1274,
+      "vwap": 1275.2,
+      "price": 1274,
+      "netFlow": -4.63,
+      "totalQty": 9290437,
+      "momScore": -1.2,
+      "signal": "SELL"
+    },
+    {
+      "sym": "ICICIBANK",
+      "ltp": 1384.5,
+      "vwap": 1383.8,
+      "price": 1384.5,
+      "netFlow": -4.82,
+      "totalQty": 10520240,
+      "momScore": -1,
+      "signal": "SELL"
+    },
+    {
+      "sym": "NESTLEIND",
+      "ltp": 1386.2,
+      "vwap": 1388.9,
+      "price": 1386.2,
+      "netFlow": -0.39,
+      "totalQty": 568935,
+      "momScore": -1,
+      "signal": "SELL"
+    },
+    {
+      "sym": "WIPRO",
+      "ltp": 166.3,
+      "vwap": 167.16,
+      "price": 166.3,
+      "netFlow": -0.67,
+      "totalQty": 9575225,
+      "momScore": -0.9,
+      "signal": "SELL"
+    },
+    {
+      "sym": "MARUTI",
+      "ltp": 12590,
+      "vwap": 12600,
+      "price": 12590,
+      "netFlow": -0.95,
+      "totalQty": 338598,
+      "momScore": -0.6,
+      "signal": "SELL"
+    },
+    {
+      "sym": "BEL",
+      "ltp": 405,
+      "vwap": 404.73,
+      "price": 405,
+      "netFlow": -0.87,
+      "totalQty": 8713653,
+      "momScore": -0.6,
+      "signal": "SELL"
+    },
+    {
+      "sym": "TCS",
+      "ltp": 2204.1,
+      "vwap": 2208.9,
+      "price": 2204.1,
+      "netFlow": -0.97,
+      "totalQty": 2490349,
+      "momScore": -0.5,
+      "signal": "SELL"
+    },
+    {
+      "sym": "SUNPHARMA",
+      "ltp": 1861,
+      "vwap": 1858.93,
+      "price": 1861,
+      "netFlow": -0.46,
+      "totalQty": 1178437,
+      "momScore": -0.5,
+      "signal": "SELL"
+    },
+    {
+      "sym": "HINDUNILVR",
+      "ltp": 1942.3,
+      "vwap": 1942.77,
+      "price": 1942.3,
+      "netFlow": -0.33,
+      "totalQty": 1232298,
+      "momScore": -0.3,
+      "signal": "SELL"
+    },
+    {
+      "sym": "TRENT",
+      "ltp": 2818.7,
+      "vwap": 2817.9,
+      "price": 2818.7,
+      "netFlow": -0.07,
+      "totalQty": 503792,
+      "momScore": -0.1,
+      "signal": "SELL"
+    }
+  ]
 }
