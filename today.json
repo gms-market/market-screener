@@ -1,21 +1,9 @@
 {
-  "updatedAt": "2026-09-10T13:00:00.000Z",
-  "buys": [
-    { "sym": "HDFCBANK", "price": 693.80, "netFlow": 480.50, "signal": "STRONG BUY" },
-    { "sym": "ICICIBANK", "price": 1228.10, "netFlow": 390.20, "signal": "STRONG BUY" },
-    { "sym": "BHARTIARTL", "price": 1540.30, "netFlow": 290.00, "signal": "STRONG BUY" },
-    { "sym": "L&T", "price": 3620.00, "netFlow": 275.40, "signal": "STRONG BUY" },
-    { "sym": "M&M", "price": 2740.00, "netFlow": 260.00, "signal": "STRONG BUY" }
-  ],
-  "sells": [
-    { "sym": "INFY", "price": 1845.20, "netFlow": -310.00, "signal": "STRONG SELL" },
-    { "sym": "TCS", price: 4210.00, "netFlow": -240.00, "signal": "STRONG SELL" }
-  ],
-  "momUp": [
-    { "sym": "HDFCBANK", "price": 693.80, "momScore": 9.4 },
-    { "sym": "M&M", "price": 2740.00, "momScore": 8.8 }
-  ],
-  "momDown": [
-    { "sym": "INFY", "price": 1845.20, "momScore": -9.1 }
-  ]
+  "updatedAt": "2026-09-10T17:00:14.846Z",
+  "totalStocksTraded": 0,
+  "allStocks": [],
+  "buys": [],
+  "sells": [],
+  "momUp": [],
+  "momDown": []
 }
