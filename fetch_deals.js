@@ -48,7 +48,15 @@ async function fetchNSEDeals() {
       else if (type.includes("SELL")) stockMap[sym].sellVal += valCr;
     });
 
-    const parsed = Object.values(stockMap).map(s => {
+    let parsed = Object.values(stockMap).map(s => {
+  const netFlow = parseFloat((s.buyVal - s.sellVal).toFixed(2));
+  const totalTurnover = s.buyVal + s.sellVal;
+  const vwap = s.totalQty > 0 ? parseFloat((s.weightedTotal / s.totalQty).toFixed(2)) : s.price;
+  const ltp = parseFloat((s.price).toFixed(2));
+  const momScore = totalTurnover > 0 ? parseFloat(((netFlow / totalTurnover) * Math.log10(totalTurnover + 10) * 10).toFixed(1)) : 0;
+  let signal = netFlow > 20 ? "STRONG BUY" : netFlow > 0.05 ? "BUY" : netFlow < -20 ? "STRONG SELL" : "SELL";
+  return { sym: s.sym, ltp: ltp, vwap: vwap, price: ltp, netFlow, totalQty: s.totalQty, momScore, signal };
+});
       const netFlow = parseFloat((s.buyVal - s.sellVal).toFixed(2));
       const totalTurnover = s.buyVal + s.sellVal;
       const vwap = s.totalQty > 0 ? parseFloat((s.weightedTotal / s.totalQty).toFixed(2)) : s.price;
