@@ -4,7 +4,7 @@ on:
   schedule:
     # 1:00 PM UTC = 6:30 PM IST (Mon-Fri)
     - cron: '0 13 * * 1-5'
-  workflow_dispatch: # Allows you to also trigger it manually anytime via a button
+  workflow_dispatch: # Allows manual trigger anytime
 
 jobs:
   update-data:
@@ -18,7 +18,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
 
       - name: Run Data Collector
         run: node fetch_deals.js
