@@ -61,14 +61,17 @@ async function fetchNSEDeals() {
     });
 
     // 4. Output the structured payload
+    // Output the entire universe of traded stocks, plus sorted rankings
     const output = {
       updatedAt: new Date().toISOString(),
-      buys: parsed.filter(d => d.netFlow > 0.05).sort((a, b) => b.netFlow - a.netFlow).slice(0, 20),
-      sells: parsed.filter(d => d.netFlow < -0.05).sort((a, b) => a.netFlow - b.netFlow).slice(0, 20),
-      momUp: parsed.filter(d => d.momScore > 2).sort((a, b) => b.momScore - a.momScore).slice(0, 10),
-      momDown: parsed.filter(d => d.momScore < -2).sort((a, b) => a.momScore - b.momScore).slice(0, 10)
+      totalStocksTraded: parsed.length,
+      allStocks: parsed.sort((a, b) => b.netFlow - a.netFlow),
+      buys: parsed.filter(d => d.netFlow > 0.05).sort((a, b) => b.netFlow - a.netFlow),
+      sells: parsed.filter(d => d.netFlow < -0.05).sort((a, b) => a.netFlow - b.netFlow),
+      momUp: parsed.filter(d => d.momScore > 2).sort((a, b) => b.momScore - a.momScore),
+      momDown: parsed.filter(d => d.momScore < -2).sort((a, b) => a.momScore - b.momScore)
     };
-
+    
     fs.writeFileSync("today.json", JSON.stringify(output, null, 2));
     console.log("Successfully generated today.json with current market data!");
   } catch (err) {
