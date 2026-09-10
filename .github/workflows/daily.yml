@@ -2,13 +2,14 @@ name: Daily Institutional Data Sync
 
 on:
   schedule:
-    # 1:00 PM UTC = 6:30 PM IST (Mon-Fri)
-    - cron: '0 13 * * 1-5'
-  workflow_dispatch: # Allows manual trigger anytime
+    # 3:00 PM UTC = 8:30 PM IST (Monday through Friday)
+    - cron: '0 15 * * 1-5'
+  workflow_dispatch: # Allows manual run anytime via Actions tab
 
 jobs:
   update-data:
     runs-on: ubuntu-latest
+    timeout-minutes: 3
     permissions:
       contents: write
     steps:
