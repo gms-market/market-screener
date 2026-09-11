@@ -50,6 +50,25 @@
     .load-more-container { padding: 14px; text-align: center; border-top: 1px solid var(--border); background: var(--card); }
     .btn-more { background: #232f4b; color: #fff; border: 1px solid var(--border); padding: 8px 18px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; }
     .btn-more:hover { background: var(--accent); }
+
+    /* Clean PDF / Print Styles */
+    @media print {
+      body { background: #ffffff !important; color: #000000 !important; padding: 0 !important; }
+      .wrapper { max-width: 100% !important; margin: 0 !important; }
+      .no-print, .toolbar, .load-more-container, button { display: none !important; }
+      .card { background: #ffffff !important; border: 1px solid #cbd5e1 !important; margin-bottom: 20px !important; page-break-inside: avoid; }
+      .card-head { background: #f1f5f9 !important; color: #0f172a !important; border-bottom: 1px solid #cbd5e1 !important; }
+      table { font-size: 10px !important; width: 100% !important; }
+      th { background: #e2e8f0 !important; color: #1e293b !important; }
+      td { border-top: 1px solid #e2e8f0 !important; color: #0f172a !important; }
+      .cur-price { color: #0f172a !important; font-weight: 700 !important; }
+      .vwap-price { color: #475569 !important; }
+      .badge-buy { background: #dcfce7 !important; color: #15803d !important; border: 1px solid #15803d !important; }
+      .badge-sell { background: #fee2e2 !important; color: #b91c1c !important; border: 1px solid #b91c1c !important; }
+      footer { border-top: 1px solid #cbd5e1 !important; background: #f8fafc !important; color: #64748b !important; }
+      #splitLeaderboards { display: block !important; }
+      div { max-height: none !important; overflow: visible !important; }
+    }
   </style>
 </head>
 <body>
@@ -59,7 +78,10 @@
         <h2>NSE Institutional Market Screener (Full Universe)</h2>
         <div id="lastSync" class="status-badge">Connecting to market feed...</div>
       </div>
-      <button onclick="loadDailyFeed()" style="background:var(--accent); color:#fff; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; font-weight:600;">↺ Refresh Feed</button>
+      <div style="display: flex; gap: 10px;" class="no-print">
+        <button onclick="exportToPDF()" style="background:#10b981; color:#fff; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; font-weight:600;">📄 Download Report (PDF)</button>
+        <button onclick="loadDailyFeed()" style="background:var(--accent); color:#fff; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; font-weight:600;">↺ Refresh Feed</button>
+      </div>
     </header>
 
     <div class="toolbar">
@@ -136,7 +158,7 @@
   </div>
 
   <script>
-    // 1. PRIVACY PROTECTION SHIELD (Change "TradePass945" to your own password)
+    // 1. PRIVACY PROTECTION SHIELD (Update password inside quotes if needed)
     (function() {
       const ACCESS_KEY = "gmspass1981";
       const authenticated = sessionStorage.getItem("app_authenticated");
@@ -329,6 +351,26 @@
       } catch (err) {
         console.log("Maintaining session state");
       }
+    }
+
+    // PDF Export Function
+    function exportToPDF() {
+      const prevDisplay = document.getElementById('splitLeaderboards').style.display;
+      document.getElementById('splitLeaderboards').style.display = 'block';
+      
+      if (masterUniverse.length > 0) {
+        initMasterTable(masterUniverse);
+        const fullRows = renderRowChunk(masterUniverse, 0, masterUniverse.length);
+        document.getElementById('fullUniverseTable').innerHTML = fullRows;
+        document.getElementById('loadMoreBox').style.display = 'none';
+      }
+
+      window.print();
+
+      setTimeout(() => {
+        document.getElementById('splitLeaderboards').style.display = prevDisplay;
+        initMasterTable(masterUniverse);
+      }, 1000);
     }
 
     loadDailyFeed();
