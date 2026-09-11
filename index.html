@@ -122,9 +122,43 @@
         </div>
       </div>
     </div>
+
+    <!-- SEBI REGULATORY DISCLAIMER -->
+    <footer style="margin-top: 36px; padding: 20px; border-top: 1px solid var(--border); background: var(--card); border-radius: 8px; font-size: 11px; line-height: 1.6; color: var(--dim);">
+      <p style="font-weight: 700; color: #f87171; margin-bottom: 6px; text-transform: uppercase;">Regulatory Disclaimer (SEBI Compliance Notice)</p>
+      <p>
+        The information and analytical data provided on this platform are strictly for <strong>educational and informational purposes only</strong> and do not constitute financial advice, investment recommendations, research reports, or an offer or solicitation to buy or sell any securities. 
+      </p>
+      <p style="margin-top: 6px;">
+        The creator and maintainers of this tool are <strong>not SEBI registered Research Analysts, Investment Advisors, or Portfolio Managers</strong> under SEBI (Research Analysts) Regulations, 2014, or SEBI (Investment Advisers) Regulations, 2013. Stock market investments and derivative instruments are subject to high market risks; consult a qualified, SEBI-registered financial consultant before executing any live trading decisions.
+      </p>
+    </footer>
   </div>
 
   <script>
+    // 1. PRIVACY PROTECTION SHIELD (Change "TradePass945" to your own password)
+    (function() {
+      const ACCESS_KEY = "TradePass945";
+      const authenticated = sessionStorage.getItem("app_authenticated");
+      
+      if (!authenticated) {
+        const input = prompt("Private Portal: Enter access password to view market screener");
+        if (input === ACCESS_KEY) {
+          sessionStorage.setItem("app_authenticated", "true");
+        } else {
+          document.body.innerHTML = `
+            <div style="display:flex; justify-content:center; align-items:center; height:100vh; background:#0b0f19; color:#ef4444; font-family:sans-serif; text-align:center;">
+              <div>
+                <h2>Access Denied</h2>
+                <p style="color:#94a3b8; margin-top:8px;">Unauthorized access to private screener portal.</p>
+                <button onclick="location.reload()" style="margin-top:16px; padding:8px 16px; background:#232f4b; color:#fff; border:none; border-radius:6px; cursor:pointer;">Retry Password</button>
+              </div>
+            </div>`;
+          throw new Error("Unauthorized access stopped.");
+        }
+      }
+    })();
+
     let masterUniverse = [];
     let currentFilteredList = [];
     let displayedCount = 0;
@@ -277,7 +311,7 @@
         second: '2-digit',
         hour12: true
       });
-      document.getElementById('lastSync').innerText = `Market Session: Post-Close (08:30 PM Finalized) | Live Clock: ${currentFormatted}`;
+      document.getElementById('lastSync').innerText = `Market Session: Post-Close (09:45 PM Finalized) | Live Clock: ${currentFormatted}`;
     }
     updateClock();
     setInterval(updateClock, 1000);
