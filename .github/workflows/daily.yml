@@ -3,7 +3,7 @@ name: Daily Institutional Data Sync
 on:
   schedule:
     # Runs at 16:15 UTC (09:45 PM IST) Monday through Friday
-    - cron: '15 16 * * 1-5'
+    - cron: '18 16 * * 1-5'
   workflow_dispatch: # Allows manual trigger anytime
 
 jobs:
